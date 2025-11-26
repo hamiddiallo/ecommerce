@@ -66,19 +66,11 @@ function LoginForm() {
 
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-sm">
-        <div className="mb-6 text-center">
-          <Link href="/" className="inline-flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-              <span className="text-xl font-bold text-primary-foreground">BG</span>
-            </div>
-            <span className="text-2xl font-semibold">Boutique Guinée</span>
-          </Link>
-        </div>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Connexion</CardTitle>
-            <CardDescription>Connectez-vous à votre compte</CardDescription>
+      <div className="flex min-h-screen items-center justify-center bg-muted/30 px-4 py-12 sm:px-6 lg:px-8">
+        <Card className="w-full max-w-md">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl font-bold sm:text-3xl">Connexion</CardTitle>
+            <CardDescription>Entrez vos identifiants pour accéder à votre compte</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin}>

@@ -53,16 +53,16 @@ export default async function HomePage() {
       <main className="flex-1">
         {/* Hero Section */}
         <section className="border-b bg-gradient-to-b from-muted/50 to-background">
-          <div className="container py-12 md:py-20">
-            <div className="mx-auto max-w-3xl text-center">
-              <h1 className="text-balance text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">
+          <div className="container px-4 py-16 sm:px-6 md:py-24 lg:px-8">
+            <div className="mx-auto max-w-4xl text-center">
+              <h1 className="text-balance text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
                 Bienvenue sur Boutique Guinée
               </h1>
-              <p className="mt-4 text-pretty text-lg text-muted-foreground md:text-xl">
+              <p className="mx-auto mt-6 max-w-2xl text-pretty text-base text-muted-foreground sm:text-lg md:text-xl">
                 Découvrez notre large sélection de produits de qualité : cosmétiques, hygiène, fournitures scolaires,
                 articles ménagers et bien plus encore.
               </p>
-              <div className="mt-8 flex flex-wrap justify-center gap-4">
+              <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
                 {isAdmin && (
                   <Button size="lg" variant="default" asChild>
                     <Link href="/admin">
@@ -86,23 +86,23 @@ export default async function HomePage() {
         </section>
 
         {/* Products Section */}
-        <section id="products" className="py-12">
-          <div className="container">
-            <div className="mb-8 flex items-center justify-between">
-              <div>
-                <h2 className="text-3xl font-bold">Nos Produits</h2>
-                <p className="mt-2 text-muted-foreground">Découvrez notre sélection de produits populaires</p>
-              </div>
+        <section id="products" className="py-16 sm:py-20">
+          <div className="container px-4 sm:px-6 lg:px-8">
+            <div className="mb-12 text-center sm:text-left">
+              <h2 className="text-3xl font-bold sm:text-4xl">Nos Produits</h2>
+              <p className="mt-3 text-base text-muted-foreground sm:text-lg">
+                Découvrez notre sélection de produits populaires
+              </p>
             </div>
 
             {error ? (
-              <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-6 text-center">
+              <div className="mx-auto max-w-2xl rounded-lg border border-destructive/50 bg-destructive/10 p-8 text-center">
                 <p className="text-destructive">
                   Impossible de charger les produits. Veuillez vérifier la configuration de la base de données.
                 </p>
               </div>
             ) : products && products.length > 0 ? (
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <div className="grid gap-6 sm:grid-cols-2 md:gap-8 lg:grid-cols-3 xl:grid-cols-4">
                 {products.map((product: any) => (
                   <ProductCard
                     key={product.id}
@@ -116,31 +116,33 @@ export default async function HomePage() {
                 ))}
               </div>
             ) : (
-              <div className="py-12 text-center">
-                <p className="text-muted-foreground">Aucun produit disponible pour le moment.</p>
+              <div className="py-16 text-center">
+                <p className="text-base text-muted-foreground sm:text-lg">
+                  Aucun produit disponible pour le moment.
+                </p>
               </div>
             )}
           </div>
         </section>
 
         {/* Features Section */}
-        <section className="border-t bg-muted/30 py-12">
-          <div className="container">
-            <div className="grid gap-8 md:grid-cols-3">
+        <section className="border-t bg-muted/30 py-16 sm:py-20">
+          <div className="container px-4 sm:px-6 lg:px-8">
+            <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
               <div className="text-center">
-                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                  <svg className="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                  <svg className="h-8 w-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h3 className="mb-2 font-semibold">Produits de Qualité</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="mb-3 text-xl font-semibold">Produits de Qualité</h3>
+                <p className="text-sm text-muted-foreground sm:text-base">
                   Nous sélectionnons uniquement des produits de qualité supérieure
                 </p>
               </div>
               <div className="text-center">
-                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                  <svg className="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                  <svg className="h-8 w-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -149,12 +151,14 @@ export default async function HomePage() {
                     />
                   </svg>
                 </div>
-                <h3 className="mb-2 font-semibold">Livraison Rapide</h3>
-                <p className="text-sm text-muted-foreground">Recevez vos commandes rapidement partout en Guinée</p>
+                <h3 className="mb-3 text-xl font-semibold">Livraison Rapide</h3>
+                <p className="text-sm text-muted-foreground sm:text-base">
+                  Recevez vos commandes rapidement partout en Guinée
+                </p>
               </div>
-              <div className="text-center">
-                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                  <svg className="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="text-center sm:col-span-2 lg:col-span-1">
+                <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                  <svg className="h-8 w-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -163,8 +167,10 @@ export default async function HomePage() {
                     />
                   </svg>
                 </div>
-                <h3 className="mb-2 font-semibold">Paiement Sécurisé</h3>
-                <p className="text-sm text-muted-foreground">Vos transactions sont sécurisées et protégées</p>
+                <h3 className="mb-3 text-xl font-semibold">Paiement Sécurisé</h3>
+                <p className="text-sm text-muted-foreground sm:text-base">
+                  Vos transactions sont sécurisées et protégées
+                </p>
               </div>
             </div>
           </div>

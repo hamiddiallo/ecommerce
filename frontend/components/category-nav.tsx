@@ -13,8 +13,8 @@ export async function CategoryNav() {
 
   return (
     <nav className="border-b bg-muted/30">
-      <div className="container">
-        <ul className="flex gap-6 overflow-x-auto py-3 text-sm">
+      <div className="container px-4 sm:px-6 lg:px-8">
+        <ul className="flex gap-4 overflow-x-auto py-3 text-sm scrollbar-hide sm:gap-6">
           <li>
             <Link href="/" className="whitespace-nowrap font-medium text-foreground hover:text-primary">
               Tous les produits

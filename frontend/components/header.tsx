@@ -32,41 +32,61 @@ export async function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
+      <div className="container flex h-16 items-center justify-between gap-2 px-4 sm:gap-4 sm:px-6 lg:px-8">
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2 flex-shrink-0">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
             <span className="text-lg font-bold text-primary-foreground">ETS</span>
           </div>
-          <span className="text-xl font-semibold"> MLF</span>
+          <span className="hidden text-xl font-semibold sm:inline">MLF</span>
         </Link>
 
-        <div className="hidden flex-1 items-center justify-center px-8 md:flex">
+        {/* Search Bar - Hidden on mobile */}
+        <div className="hidden flex-1 items-center justify-center px-4 md:flex lg:px-8">
           <SearchBar />
         </div>
-        <Button variant="ghost" asChild>
-          <Link href="/homepage">
-            <Home className="mr-2 h-4 w-4" />
-            Accueil
-          </Link>
-        </Button>
 
-        <div className="flex items-center gap-2">
-          {/* Show user menu only for authenticated non-admin users */}
+        {/* Navigation Buttons */}
+        <div className="flex items-center gap-1 sm:gap-2">
+          {/* Home Button */}
+          <Button variant="ghost" size="sm" asChild className="h-9">
+            <Link href="/homepage">
+              <Home className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Accueil</span>
+            </Link>
+          </Button>
+
+          {/* User Menu for authenticated non-admin users */}
           {isAuthenticated && !isAdmin && <UserMenu />}
 
-          {/* Show login/signup buttons for non-authenticated users */}
+          {/* Cart Icon for authenticated non-admin users */}
+          {isAuthenticated && !isAdmin && (
+            <Suspense
+              fallback={
+                <Button variant="ghost" size="icon" asChild>
+                  <Link href="/cart">
+                    <ShoppingCart className="h-5 w-5" />
+                  </Link>
+                </Button>
+              }
+            >
+              <CartIcon />
+            </Suspense>
+          )}
+
+          {/* Login/Signup buttons for non-authenticated users */}
           {!isAuthenticated && (
             <>
-              <Button variant="ghost" asChild>
+              <Button variant="ghost" size="sm" asChild className="h-9">
                 <Link href="/auth/login">
                   <LogIn className="mr-2 h-4 w-4" />
-                  Connexion
+                  <span>Connexion</span>
                 </Link>
               </Button>
-              <Button asChild>
+              <Button size="sm" asChild className="h-9">
                 <Link href="/auth/sign-up">
                   <UserPlus className="mr-2 h-4 w-4" />
-                  Inscription
+                  <span>Inscription</span>
                 </Link>
               </Button>
             </>

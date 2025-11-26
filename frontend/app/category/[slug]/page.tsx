@@ -32,14 +32,14 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       <CategoryNav />
 
       <main className="flex-1">
-        <div className="container py-8">
+        <div className="container px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold">{category.name}</h1>
+            <h1 className="text-3xl font-bold sm:text-4xl">{category.name}</h1>
             {category.description && <p className="mt-2 text-muted-foreground">{category.description}</p>}
           </div>
 
           {products && products.length > 0 ? (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid gap-6 sm:grid-cols-2 md:gap-8 lg:grid-cols-3 xl:grid-cols-4">
               {products.map((product) => (
                 <ProductCard
                   key={product.id}
@@ -53,8 +53,10 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
               ))}
             </div>
           ) : (
-            <div className="py-12 text-center">
-              <p className="text-muted-foreground">Aucun produit disponible dans cette catégorie pour le moment.</p>
+            <div className="py-16 text-center">
+              <p className="text-base text-muted-foreground sm:text-lg">
+                Aucun produit disponible dans cette catégorie pour le moment.
+              </p>
             </div>
           )}
         </div>

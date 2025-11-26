@@ -85,32 +85,34 @@ export default async function OrdersPage({
       <Header />
       {await CategoryNav()}
 
-      <main className="flex-1">
-        <div className="container py-8">
-          <h1 className="mb-8 text-3xl font-bold">Mes Commandes</h1>
+      <main className="flex-1 bg-muted/30">
+        <div className="container px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+          <h1 className="mb-8 text-3xl font-bold sm:text-4xl">Mes Commandes</h1>
 
           {/* Utilisation du composant client pour le filtre */}
           <OrdersFilter currentStatus={statusFilter} />
 
           {!orders || orders.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16">
-              <Package className="mb-4 h-16 w-16 text-muted-foreground" />
-              <h2 className="mb-2 text-xl font-semibold">
-                {statusFilter === "all"
-                  ? "Aucune commande"
-                  : `Aucune commande ${currentFilterLabel.toLowerCase()}`
-                }
-              </h2>
-              <p className="mb-6 text-muted-foreground text-center">
-                {statusFilter === "all"
-                  ? "Vous n'avez pas encore passé de commande"
-                  : `Vous n'avez pas de commande avec le statut "${currentFilterLabel}"`
-                }
-              </p>
-              <Button asChild>
-                <Link href="/">Commencer mes achats</Link>
-              </Button>
-            </div>
+            <Card className="mx-auto max-w-md">
+              <CardContent className="flex flex-col items-center py-12 text-center">
+                <Package className="mb-4 h-16 w-16 text-muted-foreground" />
+                <h2 className="mb-2 text-xl font-semibold">
+                  {statusFilter === "all"
+                    ? "Aucune commande"
+                    : `Aucune commande ${currentFilterLabel.toLowerCase()}`
+                  }
+                </h2>
+                <p className="mb-6 text-muted-foreground text-center">
+                  {statusFilter === "all"
+                    ? "Vous n'avez pas encore passé de commande"
+                    : `Vous n'avez pas de commande avec le statut "${currentFilterLabel}"`
+                  }
+                </p>
+                <Button asChild>
+                  <Link href="/">Commencer mes achats</Link>
+                </Button>
+              </CardContent>
+            </Card>
           ) : (
             <div className="space-y-4">
               {/* Indicateur du filtre actif */}

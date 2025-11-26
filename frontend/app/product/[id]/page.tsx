@@ -41,7 +41,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       <CategoryNav />
 
       <main className="flex-1">
-        <div className="container py-8">
+        <div className="container px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
           <Button variant="ghost" asChild className="mb-6">
             <Link href="/">
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -49,7 +49,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </Link>
           </Button>
 
-          <div className="grid gap-8 lg:grid-cols-2">
+          <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
             {/* Product Image */}
             <div className="relative aspect-square overflow-hidden rounded-lg bg-muted">
               <Image
@@ -72,15 +72,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 </Link>
               )}
 
-              <h1 className="text-3xl font-bold">{product.name}</h1>
+              <h1 className="text-3xl font-bold sm:text-4xl">{product.name}</h1>
 
               <div className="mt-4 flex items-baseline gap-2">
-                <span className="text-4xl font-bold text-primary">{formattedPrice}</span>
+                <span className="text-4xl font-bold text-primary sm:text-5xl">{formattedPrice}</span>
                 <span className="text-lg text-muted-foreground">/ {product.unit}</span>
               </div>
 
               {/* Stock Status */}
-              <div className="mt-4">
+              <div className="mt-6">
                 {product.stock > 10 && (
                   <div className="flex items-center gap-2 text-sm text-green-600">
                     <Package className="h-4 w-4" />
@@ -103,9 +103,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
               {/* Description */}
               {product.description && (
-                <div className="mt-6">
-                  <h2 className="mb-2 font-semibold">Description</h2>
-                  <p className="text-muted-foreground">{product.description}</p>
+                <div className="mt-8">
+                  <h2 className="mb-3 text-lg font-semibold">Description</h2>
+                  <p className="text-muted-foreground leading-relaxed">{product.description}</p>
                 </div>
               )}
 

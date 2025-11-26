@@ -55,11 +55,11 @@ export default async function CheckoutPage() {
       <Header />
       <CategoryNav />
 
-      <main className="flex-1">
-        <div className="container py-8">
-          <h1 className="mb-8 text-3xl font-bold">Finaliser la commande</h1>
+      <main className="flex-1 bg-muted/30">
+        <div className="container px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+          <h1 className="mb-8 text-3xl font-bold sm:text-4xl">Finaliser la commande</h1>
 
-          <div className="grid gap-8 lg:grid-cols-3">
+          <div className="grid gap-8 lg:grid-cols-3 lg:gap-12">
             {/* Checkout Form */}
             <div className="lg:col-span-2">
               <Card>

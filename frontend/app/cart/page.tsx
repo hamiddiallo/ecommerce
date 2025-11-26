@@ -46,21 +46,28 @@ export default async function CartPage() {
       <Header />
       <CategoryNav />
 
-      <main className="flex-1">
-        <div className="container py-8">
-          <h1 className="mb-8 text-3xl font-bold">Mon Panier</h1>
+      <main className="flex-1 bg-muted/30">
+        <div className="container px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold sm:text-4xl">Mon Panier</h1>
+            <p className="mt-2 text-muted-foreground">
+              {cartItems?.length || 0} article{cartItems?.length > 1 ? "s" : ""}
+            </p>
+          </div>
 
           {!cartItems || cartItems.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16">
-              <ShoppingBag className="mb-4 h-16 w-16 text-muted-foreground" />
-              <h2 className="mb-2 text-xl font-semibold">Votre panier est vide</h2>
-              <p className="mb-6 text-muted-foreground">Ajoutez des produits pour commencer vos achats</p>
-              <Button asChild>
-                <Link href="/">Continuer mes achats</Link>
-              </Button>
-            </div>
+            <Card className="mx-auto max-w-md">
+              <CardContent className="flex flex-col items-center py-12 text-center">
+                <ShoppingBag className="mb-4 h-16 w-16 text-muted-foreground" />
+                <h2 className="mb-2 text-xl font-semibold">Votre panier est vide</h2>
+                <p className="mb-6 text-muted-foreground">Ajoutez des produits pour commencer vos achats</p>
+                <Button asChild>
+                  <Link href="/">Continuer mes achats</Link>
+                </Button>
+              </CardContent>
+            </Card>
           ) : (
-            <div className="grid gap-8 lg:grid-cols-3">
+            <div className="grid gap-8 lg:grid-cols-3 lg:gap-12">
               {/* Cart Items */}
               <div className="space-y-4 lg:col-span-2">
                 {cartItems.map((item: any) => (

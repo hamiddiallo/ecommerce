@@ -4,8 +4,13 @@ import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { LogOut } from "lucide-react"
 
-export function LogoutButton() {
+interface LogoutButtonProps {
+  iconOnly?: boolean
+}
+
+export function LogoutButton({ iconOnly = false }: LogoutButtonProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
 
@@ -23,6 +28,14 @@ export function LogoutButton() {
       console.error("Erreur lors de la déconnexion:", error)
       setIsLoading(false)
     }
+  }
+
+  if (iconOnly) {
+    return (
+      <Button variant="ghost" size="sm" onClick={handleLogout} disabled={isLoading} className="h-9">
+        <LogOut className="h-4 w-4" />
+      </Button>
+    )
   }
 
   return (

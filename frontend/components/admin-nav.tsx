@@ -1,46 +1,52 @@
 import Link from "next/link"
-import { LayoutDashboard, Package, ShoppingBag, LogOut } from "lucide-react"
+import { LayoutDashboard, Package, ShoppingBag, LogOut, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { LogoutButton } from "./logout-button"
 
 export function AdminNav() {
   return (
-    <nav className="flex h-16 items-center justify-between border-b bg-background px-6">
-      <div className="flex items-center gap-6">
-        <Link href="/admin" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-            <span className="text-lg font-bold text-primary-foreground">MLF</span>
+    <nav className="border-b bg-background">
+      <div className="container px-4 sm:px-6 lg:px-8">
+        <div className="flex h-14 items-center justify-between gap-2">
+          {/* Logo */}
+          <Link href="/admin" className="flex items-center gap-2 flex-shrink-0">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+              <span className="text-lg font-bold text-primary-foreground">A</span>
+            </div>
+            <span className="hidden text-lg font-semibold sm:inline">Admin</span>
+          </Link>
+
+          {/* Navigation Links */}
+          <div className="flex items-center gap-1 sm:gap-2">
+            <Button variant="ghost" size="sm" asChild className="h-9">
+              <Link href="/admin">
+                <LayoutDashboard className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Dashboard</span>
+              </Link>
+            </Button>
+            <Button variant="ghost" size="sm" asChild className="h-9">
+              <Link href="/admin/products">
+                <Package className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Produits</span>
+              </Link>
+            </Button>
+            <Button variant="ghost" size="sm" asChild className="h-9">
+              <Link href="/admin/orders">
+                <ShoppingBag className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Commandes</span>
+              </Link>
+            </Button>
+
+            <Button variant="ghost" size="sm" asChild className="h-9">
+              <Link href="/">
+                <ExternalLink className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Voir le site</span>
+              </Link>
+            </Button>
+
+            <LogoutButton iconOnly />
           </div>
-          <span className="text-xl font-semibold">Admin</span>
-        </Link>
-
-        <div className="flex gap-1">
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/admin">
-              <LayoutDashboard className="mr-2 h-4 w-4" />
-              Tableau de bord
-            </Link>
-          </Button>
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/admin/products">
-              <Package className="mr-2 h-4 w-4" />
-              Produits
-            </Link>
-          </Button>
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/admin/orders">
-              <ShoppingBag className="mr-2 h-4 w-4" />
-              Commandes
-            </Link>
-          </Button>
         </div>
-      </div>
-
-      <div className="flex items-center gap-2">
-        <Button variant="ghost" size="sm" asChild>
-          <Link href="/">Voir le site</Link>
-        </Button>
-        <LogoutButton />
       </div>
     </nav>
   )

@@ -1,21 +1,35 @@
 import Link from "next/link"
-import { Search, User, Package, Settings } from "lucide-react"
+import { ShoppingCart, LogIn, UserPlus, Home } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { CartIcon } from "@/components/cart-icon"
 import { Suspense } from "react"
-import { LogoutButton } from "@/components/logout-button"
+import { SearchBar } from "@/components/search-bar"
+import { UserMenu } from "@/components/user-menu"
+import { createServerSupabaseClient } from "@/lib/supabase/server"
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+export async function Header() {
+  // Check if user is authenticated and if admin
+  let isAuthenticated = false
+  let isAdmin = false
 
-export function Header() {
+  try {
+    const supabase = await createServerSupabaseClient()
+    if (supabase) {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        isAuthenticated = true
+        const { data: adminUser } = await supabase
+          .from("admin_users")
+          .select("id")
+          .eq("id", user.id)
+          .single()
+        isAdmin = !!adminUser
+      }
+    }
+  } catch (e) {
+    // Ignore errors
+  }
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
@@ -27,69 +41,36 @@ export function Header() {
         </Link>
 
         <div className="hidden flex-1 items-center justify-center px-8 md:flex">
-          <div className="relative w-full max-w-md">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input type="search" placeholder="Rechercher des produits..." className="pl-10" />
-          </div>
+          <SearchBar />
         </div>
+        <Button variant="ghost" asChild>
+          <Link href="/homepage">
+            <Home className="mr-2 h-4 w-4" />
+            Accueil
+          </Link>
+        </Button>
 
         <div className="flex items-center gap-2">
+          {/* Show user menu only for authenticated non-admin users */}
+          {isAuthenticated && !isAdmin && <UserMenu />}
 
-          {/* MENU COMPTE (Dropdown) */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <User className="h-5 w-5" />
-                <span className="sr-only">Compte</span>
-              </Button>
-            </DropdownMenuTrigger>
-
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-
-              <DropdownMenuItem asChild>
-                <Link href="/profile">
-                  <User className="mr-2 h-4 w-4" />
-                  Modifier profil
-                </Link>
-              </DropdownMenuItem>
-
-              <DropdownMenuItem asChild>
-                <Link href="/orders">
-                  <Package className="mr-2 h-4 w-4" />
-                  Mes commandes
-                </Link>
-              </DropdownMenuItem>
-
-              <DropdownMenuItem asChild>
-                <Link href="/settings">
-                  <Settings className="mr-2 h-4 w-4" />
-                  Paramètres
-                </Link>
-              </DropdownMenuItem>
-
-              <DropdownMenuSeparator />
-
-              {/* Logout intégré */}
-              <DropdownMenuItem asChild>
-                <LogoutButton />
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          {/* PANIER */}
-          <Suspense
-            fallback={
-              <Button variant="ghost" size="icon" asChild>
-                <Link href="/cart">
-                  <Search className="h-5 w-5" />
+          {/* Show login/signup buttons for non-authenticated users */}
+          {!isAuthenticated && (
+            <>
+              <Button variant="ghost" asChild>
+                <Link href="/auth/login">
+                  <LogIn className="mr-2 h-4 w-4" />
+                  Connexion
                 </Link>
               </Button>
-            }
-          >
-            <CartIcon />
-          </Suspense>
+              <Button asChild>
+                <Link href="/auth/sign-up">
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  Inscription
+                </Link>
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </header>

@@ -5,17 +5,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { updateOrderStatus } from "@/lib/admin-actions"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { Lock } from "lucide-react"
 
 interface OrderStatusSelectProps {
   orderId: string
   currentStatus: string
+  isLocked?: boolean
 }
 
-export function OrderStatusSelect({ orderId, currentStatus }: OrderStatusSelectProps) {
+export function OrderStatusSelect({ orderId, currentStatus, isLocked = false }: OrderStatusSelectProps) {
   const [isUpdating, setIsUpdating] = useState(false)
   const router = useRouter()
 
   const handleStatusChange = async (newStatus: string) => {
+    if (isLocked) {
+      toast.error("Commande verrouillée par le client")
+      return
+    }
+
     setIsUpdating(true)
 
     const result = await updateOrderStatus(orderId, newStatus)
@@ -36,6 +43,17 @@ export function OrderStatusSelect({ orderId, currentStatus }: OrderStatusSelectP
     shipped: "Expédiée",
     delivered: "Livrée",
     cancelled: "Annulée",
+  }
+
+  if (isLocked) {
+    return (
+      <div className="flex items-center gap-2 rounded-md border border-muted bg-muted/50 px-3 py-2">
+        <Lock className="h-4 w-4 text-muted-foreground" />
+        <span className="text-sm text-muted-foreground">
+          {statusLabels[currentStatus]} (Verrouillée par le client)
+        </span>
+      </div>
+    )
   }
 
   return (

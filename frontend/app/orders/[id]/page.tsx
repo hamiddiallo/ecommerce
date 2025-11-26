@@ -9,6 +9,7 @@ import Link from "next/link"
 import { notFound, redirect } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
 import Image from "next/image"
+import OrderActions from "@/components/order-actions"
 
 //
 // ✅ Interfaces pour typer les données Supabase
@@ -36,6 +37,7 @@ interface Order {
   full_name: string
   phone: string
   shipping_address: string
+  is_locked: boolean
   order_items: OrderItem[]
 }
 
@@ -158,7 +160,10 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
               <h1 className="text-3xl font-bold">Commande #{order.id.slice(0, 8)}</h1>
               <p className="mt-1 text-muted-foreground">{formattedDate}</p>
             </div>
-            {getStatusBadge(order.status)}
+            <div className="flex items-center gap-4">
+              <OrderActions orderId={order.id} status={order.status} isLocked={order.is_locked} />
+              {getStatusBadge(order.status)}
+            </div>
           </div>
 
           <div className="grid gap-6 lg:grid-cols-3">

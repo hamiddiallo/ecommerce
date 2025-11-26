@@ -80,7 +80,102 @@ async function getOrders(req, res) {
     }
 }
 
+async function updateOrderStatus(req, res) {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!status) return res.status(400).json({ error: 'Status required' });
+
+    try {
+        // Check if order is locked
+        const { data: order, error: fetchError } = await supabase
+            .from('orders')
+            .select('is_locked')
+            .eq('id', id)
+            .single();
+
+        if (fetchError || !order) return res.status(404).json({ error: 'Order not found' });
+        if (order.is_locked) return res.status(403).json({ error: 'Order is locked by client' });
+
+        const { error } = await supabase
+            .from('orders')
+            .update({ status })
+            .eq('id', id);
+
+        if (error) throw error;
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+async function cancelOrder(req, res) {
+    const { id } = req.params;
+    const { userId } = req.body; // Passed from frontend for verification
+
+    if (!userId) return res.status(400).json({ error: 'User ID required' });
+
+    try {
+        // Verify ownership and status
+        const { data: order, error: fetchError } = await supabase
+            .from('orders')
+            .select('status, user_id')
+            .eq('id', id)
+            .single();
+
+        if (fetchError || !order) return res.status(404).json({ error: 'Order not found' });
+        if (order.user_id !== userId) return res.status(403).json({ error: 'Unauthorized' });
+
+        if (['shipped', 'delivered', 'cancelled'].includes(order.status)) {
+            return res.status(400).json({ error: 'Cannot cancel order in current status' });
+        }
+
+        const { error: updateError } = await supabase
+            .from('orders')
+            .update({ status: 'cancelled', is_locked: true })
+            .eq('id', id);
+
+        if (updateError) throw updateError;
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+async function unlockOrder(req, res) {
+    const { id } = req.params;
+    const { userId } = req.body;
+
+    if (!userId) return res.status(400).json({ error: 'User ID required' });
+
+    try {
+        // Verify ownership
+        const { data: order, error: fetchError } = await supabase
+            .from('orders')
+            .select('user_id, is_locked')
+            .eq('id', id)
+            .single();
+
+        if (fetchError || !order) return res.status(404).json({ error: 'Order not found' });
+        if (order.user_id !== userId) return res.status(403).json({ error: 'Unauthorized' });
+        if (!order.is_locked) return res.status(400).json({ error: 'Order is not locked' });
+
+        const { error: updateError } = await supabase
+            .from('orders')
+            .update({ is_locked: false })
+            .eq('id', id);
+
+        if (updateError) throw updateError;
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
 module.exports = {
     createOrder,
-    getOrders
+    getOrders,
+    updateOrderStatus,
+    cancelOrder,
+    unlockOrder
 };

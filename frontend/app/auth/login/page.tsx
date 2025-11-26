@@ -37,7 +37,25 @@ function LoginForm() {
         throw error
       }
 
-      router.push(redirect)
+      // Check if user is admin
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { data: adminUser } = await supabase
+          .from("admin_users")
+          .select("id")
+          .eq("id", user.id)
+          .single()
+
+        // Redirect admin to /admin, others to requested page or home
+        if (adminUser) {
+          router.push("/admin")
+        } else {
+          router.push(redirect)
+        }
+      } else {
+        router.push(redirect)
+      }
+
       router.refresh()
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "Une erreur est survenue")

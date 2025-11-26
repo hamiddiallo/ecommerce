@@ -2,10 +2,19 @@ const supabase = require('../config/supabase');
 
 async function getProducts(req, res) {
     try {
-        const { data, error } = await supabase
+        const { search } = req.query;
+
+        let query = supabase
             .from('products')
-            .select('*')
-            .order('created_at', { ascending: false });
+            .select('*');
+
+        // Add search filter if search term provided
+        if (search) {
+            // Use ilike for case-insensitive search on name
+            query = query.ilike('name', `%${search}%`);
+        }
+
+        const { data, error } = await query.order('created_at', { ascending: false });
 
         if (error) throw error;
         res.json(data);

@@ -1,3 +1,5 @@
+"use server"
+
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -65,5 +67,69 @@ export async function getOrders() {
   } catch (error) {
     console.error("Failed to fetch orders:", error);
     return [];
+  }
+}
+
+export async function cancelOrder(orderId: string) {
+  const supabase = await createServerSupabaseClient();
+  if (!supabase) throw new Error("Supabase client not configured");
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Non autorisé" };
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/orders/${orderId}/cancel`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: user.id }),
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      return { error: error.error || "Erreur lors de l'annulation" };
+    }
+
+    revalidatePath("/orders");
+    revalidatePath(`/orders/${orderId}`);
+    return { success: true };
+  } catch (error) {
+    return { error: "Erreur de connexion au serveur" };
+  }
+}
+
+export async function unlockOrder(orderId: string) {
+  const supabase = await createServerSupabaseClient();
+  if (!supabase) throw new Error("Supabase client not configured");
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Non autorisé" };
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/orders/${orderId}/unlock`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: user.id }),
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      return { error: error.error || "Erreur lors du déverrouillage" };
+    }
+
+    revalidatePath("/orders");
+    revalidatePath(`/orders/${orderId}`);
+    return { success: true };
+  } catch (error) {
+    return { error: "Erreur de connexion au serveur" };
   }
 }

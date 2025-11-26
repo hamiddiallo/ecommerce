@@ -31,6 +31,7 @@ interface Order {
   full_name: string
   phone: string
   shipping_address: string
+  is_locked: boolean
   order_items: OrderItem[]
 }
 
@@ -142,7 +143,7 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
                   <CardTitle>Statut de la commande</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <OrderStatusSelect orderId={order.id} currentStatus={order.status} />
+                  <OrderStatusSelect orderId={order.id} currentStatus={order.status} isLocked={order.is_locked} />
                 </CardContent>
               </Card>
 

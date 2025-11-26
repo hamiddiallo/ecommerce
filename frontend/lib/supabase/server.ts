@@ -1,34 +1,31 @@
 // lib/supabase/server.ts
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { createServerClient } from "@supabase/ssr"
+import { cookies } from "next/headers"
 
-/**
- * Crée et retourne un client Supabase côté serveur (Server Component / Server Action)
- * Toujours créer un nouveau client par fonction pour éviter les problèmes avec Fluid Compute.
- */
 export async function createServerSupabaseClient() {
-  const cookieStore = await cookies();
+  const cookieStore = await cookies() // ⬅️ IMPORTANT : toujours async
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
   if (!supabaseUrl || !supabaseKey) {
-    console.warn("[server] Supabase credentials not configured");
-    return null;
+    throw new Error("[Supabase] Missing environment variables on server.")
   }
 
   return createServerClient(supabaseUrl, supabaseKey, {
     cookies: {
       getAll() {
-        return cookieStore.getAll();
+        return cookieStore.getAll()
       },
       setAll(cookiesToSet) {
         try {
-          cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
+          cookiesToSet.forEach(({ name, value, options }) => {
+            cookieStore.set(name, value, options)
+          })
         } catch {
-          // Peut arriver si appelé depuis un Server Component
+          // En RSC on ne peut pas modifier les cookies : normal
         }
       },
     },
-  });
+  })
 }

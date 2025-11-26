@@ -42,14 +42,37 @@ export async function updateSession(request: NextRequest) {
       data: { user },
     } = await supabase.auth.getUser();
 
-    const publicRoutes = ["/", "/category", "/product", "/auth"];
-    const isPublicRoute = publicRoutes.some((route) => request.nextUrl.pathname.startsWith(route));
+    // Définition stricte des routes publiques
+    // Seule la page d'accueil '/' et les routes d'auth '/auth/*' sont publiques
+    const isHomePage = request.nextUrl.pathname === "/" || request.nextUrl.pathname === "/homepage";
+    const isAuthRoute = request.nextUrl.pathname.startsWith("/auth");
+    const isPublicRoute = isHomePage || isAuthRoute;
+    const isAdminRoute = request.nextUrl.pathname.startsWith("/admin");
 
-    // Redirection si l'utilisateur n'est pas connecté et la route n'est pas publique
+    // Redirection si l'utilisateur n'est pas connecté et essaie d'accéder à une route protégée
     if (!user && !isPublicRoute) {
       const url = request.nextUrl.clone();
       url.pathname = "/auth/login";
+      // Ajouter le paramètre redirect pour revenir à la page demandée après connexion
+      url.searchParams.set("redirect", request.nextUrl.pathname);
       return NextResponse.redirect(url);
+    }
+
+    // Protection des routes admin : vérifier si l'utilisateur est admin
+    if (user && isAdminRoute) {
+      const { data: adminUser } = await supabase
+        .from("admin_users")
+        .select("id")
+        .eq("id", user.id)
+        .single();
+
+      if (!adminUser) {
+        // User is not an admin, redirect to home
+        const url = request.nextUrl.clone();
+        url.pathname = "/";
+        url.searchParams.set("error", "unauthorized");
+        return NextResponse.redirect(url);
+      }
     }
 
     return response;

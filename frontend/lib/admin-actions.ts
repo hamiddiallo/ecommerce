@@ -2,17 +2,15 @@
 
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
+import { createServerSupabaseClient } from "@/lib/supabase/server"
 
 const API_URL = "http://localhost:5000/api"
 
-// Temporarily disabled auth check for independent backend transition
 export async function checkAdminAccess() {
-  return true
-  /*
   const supabase = await createServerSupabaseClient()
-    if (!supabase) {
-      throw new Error("Supabase n'est pas configuré")
-    }
+  if (!supabase) {
+    throw new Error("Supabase n'est pas configuré")
+  }
 
   const {
     data: { user },
@@ -22,24 +20,48 @@ export async function checkAdminAccess() {
     redirect("/auth/login?redirect=/admin")
   }
 
-  const { data: isAdmin } = await supabase.from("admin_users").select("id").eq("id", user.id).single()
+  // Check if user is in admin_users table
+  const { data: adminUser, error } = await supabase
+    .from("admin_users")
+    .select("id")
+    .eq("id", user.id)
+    .single()
 
-  if (!isAdmin) {
-    redirect("/")
+  if (error || !adminUser) {
+    // User is not an admin, redirect to home
+    redirect("/?error=unauthorized")
   }
 
   return user
-  */
 }
 
+
 export async function updateOrderStatus(orderId: string, status: string) {
-  // await checkAdminAccess()
-  // TODO: Implement orders in backend
-  return { success: true }
+  await checkAdminAccess()
+
+  try {
+    const res = await fetch(`${API_URL}/orders/${orderId}/status`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ status }),
+    })
+
+    if (!res.ok) {
+      throw new Error("Erreur lors de la mise à jour du statut")
+    }
+
+    revalidatePath("/admin/orders")
+    revalidatePath(`/admin/orders/${orderId}`)
+    return { success: true }
+  } catch (error) {
+    return { error: "Erreur lors de la mise à jour du statut" }
+  }
 }
 
 export async function createProduct(formData: FormData) {
-  // await checkAdminAccess()
+  await checkAdminAccess()
 
   const productData = {
     category_id: formData.get("category_id"),
@@ -72,7 +94,7 @@ export async function createProduct(formData: FormData) {
 }
 
 export async function updateProduct(productId: string, formData: FormData) {
-  // await checkAdminAccess()
+  await checkAdminAccess()
 
   const productData = {
     category_id: formData.get("category_id"),
@@ -106,7 +128,7 @@ export async function updateProduct(productId: string, formData: FormData) {
 }
 
 export async function deleteProduct(productId: string) {
-  // await checkAdminAccess()
+  await checkAdminAccess()
 
   try {
     const res = await fetch(`${API_URL}/products/${productId}`, {

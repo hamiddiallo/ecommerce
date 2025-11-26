@@ -17,12 +17,10 @@ export function LogoutButton() {
 
       if (error) throw error
 
-      // Redirige vers la page d'accueil après déconnexion
-      router.push("/")
-      router.refresh()
+      // Force redirect to home page
+      window.location.href = "/"
     } catch (error: unknown) {
       console.error("Erreur lors de la déconnexion:", error)
-    } finally {
       setIsLoading(false)
     }
   }

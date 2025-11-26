@@ -86,7 +86,7 @@ export default function HomePage() {
             Votre boutique premium pour tous vos besoins : maison, beauté, électronique et plus encore.
           </p>
           <Button className="px-6 py-3 text-lg font-semibold" asChild>
-            <Link href="/products">Découvrir nos produits</Link>
+            <Link href="/">Découvrir nos produits</Link>
           </Button>
         </div>
       </section>
@@ -157,10 +157,10 @@ export default function HomePage() {
           <div className="md:w-1/2">
             <h2 className="text-3xl font-bold mb-4">À propos de notre gérant</h2>
             <p className="text-gray-800 mb-4">
-                M. Mouctar Diallo est un entrepreneur passionné et visionnaire, engagé à offrir à ses clients une expérience d’achat exceptionnelle. Fort de son expertise et de son sens aigu du service, il met un point d’honneur à sélectionner avec soin chaque produit disponible chez ETS MLF, en veillant à ce que la qualité, la durabilité et l’innovation soient au rendez-vous.
+              M. Mouctar Diallo est un entrepreneur passionné et visionnaire, engagé à offrir à ses clients une expérience d’achat exceptionnelle. Fort de son expertise et de son sens aigu du service, il met un point d’honneur à sélectionner avec soin chaque produit disponible chez ETS MLF, en veillant à ce que la qualité, la durabilité et l’innovation soient au rendez-vous.
             </p>
             <p className="text-gray-700  mb-4">
-                Depuis la création de la boutique, M. Mouctar s’emploie à créer un environnement où la diversité des produits répond aux besoins variés de chaque client, qu’il s’agisse d’articles ménagers, d’accessoires, de cosmétiques ou de fournitures électroniques et scolaires. Sa démarche est guidée par la conviction que chaque produit doit apporter confort, praticité et satisfaction.
+              Depuis la création de la boutique, M. Mouctar s’emploie à créer un environnement où la diversité des produits répond aux besoins variés de chaque client, qu’il s’agisse d’articles ménagers, d’accessoires, de cosmétiques ou de fournitures électroniques et scolaires. Sa démarche est guidée par la conviction que chaque produit doit apporter confort, praticité et satisfaction.
             </p>
             <p className="text-gray-700  mb-4">
               Sous sa direction, ETS MLF s’est imposée comme une référence en matière de qualité et de fiabilité, offrant un service client irréprochable et des conseils personnalisés. M. Mouctar travaille chaque jour avec rigueur et passion pour que chaque client se sente valorisé et pour que l’expérience d’achat soit agréable, fluide et mémorable.
@@ -176,7 +176,7 @@ export default function HomePage() {
           Parcourez nos produits et profitez de notre livraison rapide et sécurisée.
         </p>
         <Button className="px-6 py-3 text-lg font-semibold" asChild>
-          <Link href="/products">Commencer vos achats</Link>
+          <Link href="/">Commencer vos achats</Link>
         </Button>
       </section>
 

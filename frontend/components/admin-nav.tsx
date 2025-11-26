@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { LayoutDashboard, Package, ShoppingBag, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { LogoutButton } from "./logout-button"
 
 export function AdminNav() {
   return (
@@ -39,12 +40,7 @@ export function AdminNav() {
         <Button variant="ghost" size="sm" asChild>
           <Link href="/">Voir le site</Link>
         </Button>
-        <Button variant="ghost" size="sm" asChild>
-          <Link href="/auth/logout">
-            <LogOut className="mr-2 h-4 w-4" />
-            Déconnexion
-          </Link>
-        </Button>
+        <LogoutButton />
       </div>
     </nav>
   )

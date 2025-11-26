@@ -1,14 +1,34 @@
-// import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { Header } from "@/components/header"
 import { CategoryNav } from "@/components/category-nav"
 import { ProductCard } from "@/components/product-card"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, LayoutDashboard } from "lucide-react"
+import Link from "next/link"
 
 export default async function HomePage() {
   let products = null
   let error = null
+  let isAdmin = false
+
+  // Check if user is admin
+  try {
+    const supabase = await createServerSupabaseClient()
+    if (supabase) {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { data: adminUser } = await supabase
+          .from("admin_users")
+          .select("id")
+          .eq("id", user.id)
+          .single()
+        isAdmin = !!adminUser
+      }
+    }
+  } catch (e) {
+    // Ignore admin check errors
+  }
 
   try {
     const res = await fetch("http://localhost:5000/api/products", {
@@ -43,6 +63,14 @@ export default async function HomePage() {
                 articles ménagers et bien plus encore.
               </p>
               <div className="mt-8 flex flex-wrap justify-center gap-4">
+                {isAdmin && (
+                  <Button size="lg" variant="default" asChild>
+                    <Link href="/admin">
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      Dashboard Admin
+                    </Link>
+                  </Button>
+                )}
                 <Button size="lg" asChild>
                   <a href="#products">
                     Voir les produits

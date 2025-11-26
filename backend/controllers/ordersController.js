@@ -16,6 +16,15 @@ async function createOrder(req, res) {
             return res.status(400).json({ error: 'Panier vide' });
         }
 
+        // Check stock availability
+        for (const item of cartItems) {
+            if (item.products.stock < item.quantity) {
+                return res.status(400).json({
+                    error: `Stock insuffisant pour ${item.products.name} (Disponible: ${item.products.stock})`
+                });
+            }
+        }
+
         // Calculate total
         const total = cartItems.reduce((sum, item) => sum + (item.products.price * item.quantity), 0);
 
@@ -35,7 +44,7 @@ async function createOrder(req, res) {
 
         if (orderError) throw orderError;
 
-        // Create order items
+        // Create order items and update stock
         const orderItems = cartItems.map(item => ({
             order_id: order.id,
             product_id: item.product_id,
@@ -48,9 +57,20 @@ async function createOrder(req, res) {
         const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
 
         if (itemsError) {
-            // Rollback
+            // Rollback order
             await supabase.from('orders').delete().eq('id', order.id);
             throw itemsError;
+        }
+
+        // Decrement stock
+        for (const item of cartItems) {
+            // Actually, let's use the direct update for simplicity as requested by "no docker" user who might struggle with RPCs
+            const { error: stockError } = await supabase
+                .from('products')
+                .update({ stock: item.products.stock - item.quantity })
+                .eq('id', item.product_id);
+
+            if (stockError) console.error("Error updating stock for", item.product_id, stockError);
         }
 
         // Clear cart
@@ -90,7 +110,7 @@ async function updateOrderStatus(req, res) {
         // Check if order is locked
         const { data: order, error: fetchError } = await supabase
             .from('orders')
-            .select('is_locked')
+            .select('is_locked, status')
             .eq('id', id)
             .single();
 
@@ -103,6 +123,28 @@ async function updateOrderStatus(req, res) {
             .eq('id', id);
 
         if (error) throw error;
+
+        // If cancelling, restore stock
+        if (status === 'cancelled' && order.status !== 'cancelled') {
+            const { data: items } = await supabase
+                .from('order_items')
+                .select('product_id, quantity')
+                .eq('order_id', id);
+
+            if (items) {
+                for (const item of items) {
+                    // Get current stock first to be safe
+                    const { data: product } = await supabase.from('products').select('stock').eq('id', item.product_id).single();
+                    if (product) {
+                        await supabase
+                            .from('products')
+                            .update({ stock: product.stock + item.quantity })
+                            .eq('id', item.product_id);
+                    }
+                }
+            }
+        }
+
         res.json({ success: true });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -136,6 +178,25 @@ async function cancelOrder(req, res) {
             .eq('id', id);
 
         if (updateError) throw updateError;
+
+        // Restore stock
+        const { data: items } = await supabase
+            .from('order_items')
+            .select('product_id, quantity')
+            .eq('order_id', id);
+
+        if (items) {
+            for (const item of items) {
+                const { data: product } = await supabase.from('products').select('stock').eq('id', item.product_id).single();
+                if (product) {
+                    await supabase
+                        .from('products')
+                        .update({ stock: product.stock + item.quantity })
+                        .eq('id', item.product_id);
+                }
+            }
+        }
+
         res.json({ success: true });
     } catch (error) {
         res.status(500).json({ error: error.message });

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
@@ -27,6 +27,11 @@ interface CartItemProps {
 export function CartItem({ id, product, quantity }: CartItemProps) {
   const [isUpdating, setIsUpdating] = useState(false)
   const router = useRouter()
+
+  // Sync local state when prop changes
+  useEffect(() => {
+    setLocalQuantity(quantity)
+  }, [quantity])
 
   const formattedPrice = new Intl.NumberFormat("fr-GN", {
     style: "currency",
@@ -66,6 +71,57 @@ export function CartItem({ id, product, quantity }: CartItemProps) {
     setIsUpdating(false)
   }
 
+  const [localQuantity, setLocalQuantity] = useState(quantity)
+
+  // Sync local state when prop changes (e.g. after successful update)
+  if (quantity !== localQuantity && !isUpdating) {
+    // We only sync if we are NOT currently updating to avoid race conditions/jumping
+    // Actually, better to use useEffect for prop sync
+  }
+
+  // Let's use useEffect to sync prop to local state
+  // import { useEffect } from "react" (need to add import)
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value
+    if (val === "") {
+      setLocalQuantity(0) // Allow clearing the input
+      return
+    }
+    const numVal = parseInt(val)
+    if (!isNaN(numVal)) {
+      setLocalQuantity(numVal)
+    }
+  }
+
+  const handleBlur = () => {
+    let finalQuantity = localQuantity
+
+    // Validate quantity
+    if (finalQuantity < 1) {
+      finalQuantity = 1
+      setLocalQuantity(1)
+    }
+
+    if (finalQuantity > product.stock) {
+      toast.warning("Stock insuffisant", {
+        description: `Seulement ${product.stock} unité(s) disponible(s). Quantité ajustée.`
+      })
+      finalQuantity = product.stock
+      setLocalQuantity(product.stock)
+    }
+
+    if (finalQuantity !== quantity) {
+      handleUpdateQuantity(finalQuantity)
+    }
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.currentTarget.blur()
+    }
+  }
+
   return (
     <Card>
       <CardContent className="p-4">
@@ -97,8 +153,10 @@ export function CartItem({ id, product, quantity }: CartItemProps) {
                 </Button>
                 <Input
                   type="number"
-                  value={quantity}
-                  onChange={(e) => handleUpdateQuantity(Number.parseInt(e.target.value) || 1)}
+                  value={localQuantity}
+                  onChange={handleInputChange}
+                  onBlur={handleBlur}
+                  onKeyDown={handleKeyDown}
                   className="h-8 w-16 text-center"
                   min={1}
                   max={product.stock}

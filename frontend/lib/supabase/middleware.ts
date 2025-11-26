@@ -32,7 +32,6 @@ export async function updateSession(request: NextRequest) {
 
   // Si les credentials Supabase ne sont pas configurés, on ignore le middleware
   if (!supabaseUrl || !supabaseKey) {
-    console.log("[middleware] Supabase credentials not available, skipping auth");
     return response;
   }
 

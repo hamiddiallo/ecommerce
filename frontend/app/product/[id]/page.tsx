@@ -9,6 +9,7 @@ import Link from "next/link"
 import { ArrowLeft, Package, Truck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { ProductGallery } from "@/components/product-gallery"
 
 interface ProductPageProps {
   params: Promise<{
@@ -50,16 +51,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
           </Button>
 
           <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
-            {/* Product Image */}
-            <div className="relative aspect-square overflow-hidden rounded-lg bg-muted">
-              <Image
-                src={product.image_url || "/placeholder.svg"}
-                alt={product.name}
-                fill
-                className="object-cover"
-                priority
-              />
-            </div>
+            {/* Product Images */}
+            <ProductGallery
+              images={product.images && product.images.length > 0 ? product.images : [product.image_url]}
+              name={product.name}
+            />
 
             {/* Product Info */}
             <div className="flex flex-col">
@@ -137,6 +133,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
       </main>
 
       <Footer />
-    </div>
+    </div >
   )
 }

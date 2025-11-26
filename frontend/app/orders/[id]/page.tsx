@@ -146,8 +146,8 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
       <Header />
       <CategoryNav />
 
-      <main className="flex-1">
-        <div className="container py-8">
+      <main className="flex-1 bg-muted/30">
+        <div className="container px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
           <Button variant="ghost" asChild className="mb-6">
             <Link href="/orders">
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -155,12 +155,12 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
             </Link>
           </Button>
 
-          <div className="mb-6 flex items-start justify-between">
+          <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <h1 className="text-3xl font-bold">Commande #{order.id.slice(0, 8)}</h1>
+              <h1 className="text-2xl font-bold sm:text-3xl">Commande #{order.id.slice(0, 8)}</h1>
               <p className="mt-1 text-muted-foreground">{formattedDate}</p>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-4">
               <OrderActions orderId={order.id} status={order.status} isLocked={order.is_locked} />
               {getStatusBadge(order.status)}
             </div>

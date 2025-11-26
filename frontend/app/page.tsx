@@ -111,6 +111,7 @@ export default async function HomePage() {
                     price={product.price}
                     unit={product.unit}
                     image_url={product.image_url}
+                    images={product.images}
                     stock={product.stock}
                   />
                 ))}

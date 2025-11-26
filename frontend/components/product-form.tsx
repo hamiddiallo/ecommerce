@@ -22,18 +22,35 @@ interface ProductFormProps {
     unit: string
     stock: number
     image_url: string
+    images?: string[] // Added for multiple images
   }
 }
 
 export function ProductForm({ categories, product }: ProductFormProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
-  const [selectedImage, setSelectedImage] = useState<File | null>(null)
+  const [selectedImages, setSelectedImages] = useState<File[]>([])
+  const [existingImages, setExistingImages] = useState<string[]>(
+    product?.images && product.images.length > 0
+      ? product.images
+      : product?.image_url
+        ? [product.image_url]
+        : []
+  )
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setSelectedImage(e.target.files[0])
+    if (e.target.files) {
+      const filesArray = Array.from(e.target.files)
+      setSelectedImages((prev) => [...prev, ...filesArray])
     }
+  }
+
+  const removeSelectedImage = (index: number) => {
+    setSelectedImages((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  const removeExistingImage = (index: number) => {
+    setExistingImages((prev) => prev.filter((_, i) => i !== index))
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -42,29 +59,39 @@ export function ProductForm({ categories, product }: ProductFormProps) {
 
     const formData = new FormData(e.currentTarget)
 
-    // ✅ Si une image est sélectionnée, on la téléverse d’abord
-    if (selectedImage) {
-      const uploadResponse = await fetch("http://localhost:5000/api/upload", {
-        method: "POST",
-        body: (() => {
-          const data = new FormData()
-          data.append("file", selectedImage)
-          return data
-        })(),
-      })
+    // Remove default image field if present, we handle it manually
+    formData.delete("image")
 
-      const uploadResult = await uploadResponse.json()
-      if (uploadResult.error) {
-        toast.error("Erreur upload", { description: uploadResult.error })
-        setIsLoading(false)
-        return
+    // 1. Add existing images that weren't removed
+    existingImages.forEach((url) => {
+      formData.append("images", url)
+    })
+
+    // 2. Upload new images
+    if (selectedImages.length > 0) {
+      for (const file of selectedImages) {
+        const uploadFormData = new FormData()
+        uploadFormData.append("file", file)
+
+        try {
+          const uploadResponse = await fetch("http://localhost:5000/api/upload", {
+            method: "POST",
+            body: uploadFormData,
+          })
+
+          const uploadResult = await uploadResponse.json()
+          if (uploadResult.error) {
+            toast.error(`Erreur upload ${file.name}`, { description: uploadResult.error })
+            continue
+          }
+
+          // Add uploaded image URL to formData
+          formData.append("images", `http://localhost:5000${uploadResult.filePath}`)
+        } catch (error) {
+          console.error("Upload error:", error)
+          toast.error(`Erreur upload ${file.name}`)
+        }
       }
-
-      // On remplace le champ image_url par le chemin du fichier copié
-      // Le backend retourne un chemin relatif /uploads/filename
-      // On ajoute l'URL du backend pour l'affichage complet si nécessaire, mais stockons le relatif ou absolu selon besoin
-      // Ici on stocke l'URL complète pour simplifier l'affichage côté client
-      formData.set("image_url", `http://localhost:5000${uploadResult.filePath}`)
     }
 
     const result = product
@@ -138,13 +165,48 @@ export function ProductForm({ categories, product }: ProductFormProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="image">Image du produit *</Label>
-        <Input id="image" name="image" type="file" accept="image/*" onChange={handleImageChange} />
-        {selectedImage && (
-          <p className="text-sm text-gray-500 mt-1">
-            Image sélectionnée : {selectedImage.name}
-          </p>
-        )}
+        <Label htmlFor="images">Images du produit</Label>
+        <Input
+          id="images"
+          name="image"
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={handleImageChange}
+        />
+
+        {/* Image Previews */}
+        <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+          {/* Existing Images */}
+          {existingImages.map((url, index) => (
+            <div key={`existing-${index}`} className="relative aspect-square overflow-hidden rounded-md border bg-muted">
+              <img src={url} alt={`Existing ${index}`} className="h-full w-full object-cover" />
+              <button
+                type="button"
+                onClick={() => removeExistingImage(index)}
+                className="absolute right-1 top-1 rounded-full bg-destructive p-1 text-white hover:bg-destructive/90"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+              </button>
+              <span className="absolute bottom-1 left-1 rounded bg-black/50 px-1 text-xs text-white">Existante</span>
+            </div>
+          ))}
+
+          {/* New Selected Images */}
+          {selectedImages.map((file, index) => (
+            <div key={`new-${index}`} className="relative aspect-square overflow-hidden rounded-md border bg-muted">
+              <img src={URL.createObjectURL(file)} alt={`New ${index}`} className="h-full w-full object-cover" />
+              <button
+                type="button"
+                onClick={() => removeSelectedImage(index)}
+                className="absolute right-1 top-1 rounded-full bg-destructive p-1 text-white hover:bg-destructive/90"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+              </button>
+              <span className="absolute bottom-1 left-1 rounded bg-blue-500/50 px-1 text-xs text-white">Nouvelle</span>
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="flex gap-4">

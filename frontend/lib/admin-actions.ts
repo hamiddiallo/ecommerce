@@ -63,6 +63,10 @@ export async function updateOrderStatus(orderId: string, status: string) {
 export async function createProduct(formData: FormData) {
   await checkAdminAccess()
 
+  // Handle images array
+  const images = formData.getAll("images") as string[]
+  const imageUrl = formData.get("image_url") as string || (images.length > 0 ? images[0] : null)
+
   const productData = {
     category_id: formData.get("category_id"),
     name: formData.get("name"),
@@ -70,7 +74,8 @@ export async function createProduct(formData: FormData) {
     price: Number.parseFloat(formData.get("price") as string),
     unit: formData.get("unit"),
     stock: Number.parseInt(formData.get("stock") as string),
-    image_url: formData.get("image_url"),
+    image_url: imageUrl,
+    images: images,
   }
 
   try {
@@ -96,6 +101,10 @@ export async function createProduct(formData: FormData) {
 export async function updateProduct(productId: string, formData: FormData) {
   await checkAdminAccess()
 
+  // Handle images array
+  const images = formData.getAll("images") as string[]
+  const imageUrl = formData.get("image_url") as string || (images.length > 0 ? images[0] : null)
+
   const productData = {
     category_id: formData.get("category_id"),
     name: formData.get("name"),
@@ -103,7 +112,8 @@ export async function updateProduct(productId: string, formData: FormData) {
     price: Number.parseFloat(formData.get("price") as string),
     unit: formData.get("unit"),
     stock: Number.parseInt(formData.get("stock") as string),
-    image_url: formData.get("image_url"),
+    image_url: imageUrl,
+    images: images,
   }
 
   try {

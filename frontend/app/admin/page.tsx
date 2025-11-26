@@ -6,6 +6,7 @@ import { AdminNav } from "@/components/admin-nav"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Package, ShoppingBag, TrendingUp, Users } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts"
+import { AdminCriticalStock } from "@/components/admin-critical-stock"
 
 interface Order {
   id: string
@@ -172,7 +173,7 @@ export default function AdminDashboard() {
           </Card>
         </div>
 
-        {/* GRAPHIQUE & TOP PRODUITS */}
+        {/* GRAPHIQUE & TOP PRODUITS & STOCK CRITIQUE */}
         <div className="grid gap-6 lg:grid-cols-3 mb-8">
           <Card className="lg:col-span-2">
             <CardHeader>
@@ -191,21 +192,25 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Top 5 produits vendus</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {topProducts.map((p, i) => (
-                <div key={i} className="flex justify-between">
-                  <span>
-                    {["🟣", "🔵", "🟢", "🟡", "🟠"][i]} {p.product_name}
-                  </span>
-                  <span className="font-semibold">{p.total_quantity}</span>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+          <div className="space-y-6">
+            <AdminCriticalStock />
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Top 5 produits vendus</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {topProducts.map((p, i) => (
+                  <div key={i} className="flex justify-between">
+                    <span>
+                      {["🟣", "🔵", "🟢", "🟡", "🟠"][i]} {p.product_name}
+                    </span>
+                    <span className="font-semibold">{p.total_quantity}</span>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
         {/* Commandes récentes */}

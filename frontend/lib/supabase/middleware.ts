@@ -37,9 +37,28 @@ export async function updateSession(request: NextRequest) {
 
   try {
     const supabase = createServerSupabaseClientForMiddleware(request);
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+
+    let user = null;
+    try {
+      const { data, error } = await supabase.auth.getUser();
+
+      // Si l'erreur est liée à une session invalide, on la traite comme non authentifié
+      if (error && (
+        error.message.includes("oauth_client_id") ||
+        error.message.includes("Invalid Refresh Token") ||
+        error.message.includes("Refresh Token Not Found")
+      )) {
+        console.log("[middleware] Invalid session detected, treating as unauthenticated");
+        user = null;
+      } else if (error) {
+        throw error;
+      } else {
+        user = data.user;
+      }
+    } catch (authError) {
+      console.error("[middleware] Auth error:", authError);
+      user = null;
+    }
 
     // Définition stricte des routes publiques
     // Seule la page d'accueil '/' et les routes d'auth '/auth/*' sont publiques

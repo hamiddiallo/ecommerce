@@ -90,9 +90,16 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
           </Button>
 
           {/* En-tête commande */}
-          <div className="mb-6">
-            <h1 className="text-3xl font-bold">Commande #{order.id.slice(0, 8)}</h1>
-            <p className="mt-1 text-muted-foreground">{formattedDate}</p>
+          <div className="mb-6 flex items-start justify-between">
+            <div>
+              <h1 className="text-3xl font-bold">Commande #{order.id.slice(0, 8)}</h1>
+              <p className="mt-1 text-muted-foreground">{formattedDate}</p>
+            </div>
+            <Button asChild>
+              <Link href={`/admin/orders/${order.id}/invoice`}>
+                Générer la facture
+              </Link>
+            </Button>
           </div>
 
           <div className="grid gap-6 lg:grid-cols-3">

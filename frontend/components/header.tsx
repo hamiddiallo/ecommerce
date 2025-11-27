@@ -38,7 +38,7 @@ export async function Header() {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
             <span className="text-lg font-bold text-primary-foreground">ETS</span>
           </div>
-          <span className="hidden text-xl font-semibold sm:inline">MLF</span>
+          <span className="hidden text-xl font-semibold sm:inline">MouctarDH Distribution</span>
         </Link>
 
         {/* Search Bar - Hidden on mobile */}
@@ -60,7 +60,7 @@ export async function Header() {
           {isAuthenticated && !isAdmin && <UserMenu />}
 
           {/* Cart Icon for authenticated non-admin users */}
-          {isAuthenticated && !isAdmin && (
+          {isAuthenticated && (
             <Suspense
               fallback={
                 <Button variant="ghost" size="icon" asChild>

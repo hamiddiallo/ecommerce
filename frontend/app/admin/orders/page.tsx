@@ -9,18 +9,19 @@ import Link from "next/link"
 export default async function AdminOrdersPage({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined }
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
   await checkAdminAccess()
   const supabase = await createServerSupabaseClient()
   if (!supabase) throw new Error("❌ Supabase client not configured")
 
   // Récupérer le filtre de statut depuis les paramètres de recherche
-  const statusFilter = searchParams.status as string || "all"
+  const { status } = await searchParams
+  const statusFilter = (status as string) || "all"
 
   // Construire la requête en fonction du filtre
   let query = supabase.from("orders").select("*").order("created_at", { ascending: false })
-  
+
   // Appliquer le filtre si différent de "all"
   if (statusFilter !== "all") {
     query = query.eq("status", statusFilter)
@@ -130,8 +131,8 @@ export default async function AdminOrdersPage({
             <Card>
               <CardContent className="py-12 text-center">
                 <p className="text-muted-foreground">
-                  {statusFilter === "all" 
-                    ? "Aucune commande" 
+                  {statusFilter === "all"
+                    ? "Aucune commande"
                     : `Aucune commande avec le statut "${statusFilters.find(f => f.value === statusFilter)?.label}"`
                   }
                 </p>

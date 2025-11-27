@@ -115,7 +115,8 @@ export async function getCartCount() {
     if (!res.ok) return 0
 
     const cartItems = await res.json()
-    return cartItems.reduce((total: number, item: any) => total + item.quantity, 0)
+    // Return the number of unique items (rows) instead of total quantity
+    return cartItems.length
   } catch (error) {
     return 0
   }

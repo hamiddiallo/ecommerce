@@ -9,6 +9,7 @@ import Link from "next/link"
 import { redirect } from "next/navigation"
 import { Package } from "lucide-react"
 import { OrdersFilter } from "@/components/orders-filter"
+import { PaginationControls } from "@/components/ui/pagination-controls"
 
 // Options de filtre pour les statuts
 const statusFilters = [
@@ -23,7 +24,7 @@ const statusFilters = [
 export default async function OrdersPage({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined }
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
   const supabase = await createServerSupabaseClient()
   if (!supabase) {
@@ -38,24 +39,24 @@ export default async function OrdersPage({
     redirect("/auth/login?redirect=/orders")
   }
 
-  // Récupérer le filtre de statut depuis les paramètres de recherche
-  const statusFilter = searchParams.status as string || "all"
+  // Récupérer les paramètres
+  const { status, page } = await searchParams
+  const statusFilter = (status as string) || "all"
+  const currentPage = Number(page) || 1
+  const limit = 10
 
-  // Construire la requête en fonction du filtre
-  // Note: Backend filtering not fully implemented yet, fetching all and filtering in JS for now or updating backend
-  // For now, let's fetch all and filter here or pass query param if backend supports it
-  // I'll update backend to support status filter later if needed, but for now let's just fetch all
+  const res = await fetch(
+    `http://localhost:5000/api/orders?userId=${user.id}&page=${currentPage}&limit=${limit}&status=${statusFilter}`,
+    {
+      cache: "no-store",
+    }
+  )
 
-  const res = await fetch(`http://localhost:5000/api/orders?userId=${user.id}`, {
-    cache: "no-store",
-  })
+  const responseData = res.ok ? await res.json() : { data: [], meta: { totalPages: 0 } }
 
-  let orders = res.ok ? await res.json() : []
-
-  // Appliquer le filtre si différent de "all"
-  if (statusFilter !== "all") {
-    orders = orders.filter((o: any) => o.status === statusFilter)
-  }
+  // Handle both old array response (fallback) and new object response
+  const orders = Array.isArray(responseData) ? responseData : (responseData.data || [])
+  const totalPages = responseData.meta?.totalPages || 0
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
@@ -119,7 +120,6 @@ export default async function OrdersPage({
               {statusFilter !== "all" && (
                 <div className="text-sm text-muted-foreground">
                   Affichage des commandes : <span className="font-medium">{currentFilterLabel}</span>
-                  {" "}({orders.length} commande{orders.length > 1 ? 's' : ''})
                 </div>
               )}
 
@@ -163,6 +163,8 @@ export default async function OrdersPage({
                   </Card>
                 )
               })}
+
+              <PaginationControls totalPages={totalPages} currentPage={currentPage} />
             </div>
           )}
         </div>

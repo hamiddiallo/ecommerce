@@ -6,9 +6,19 @@ import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, LayoutDashboard } from "lucide-react"
 import Link from "next/link"
+import { PaginationControls } from "@/components/ui/pagination-controls"
 
-export default async function HomePage() {
+interface HomePageProps {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}
+
+export default async function HomePage({ searchParams }: HomePageProps) {
+  const { page } = await searchParams
+  const currentPage = Number(page) || 1
+  const limit = 12
+
   let products = null
+  let totalPages = 0
   let error = null
   let isAdmin = false
 
@@ -31,7 +41,7 @@ export default async function HomePage() {
   }
 
   try {
-    const res = await fetch("http://localhost:5000/api/products", {
+    const res = await fetch(`http://localhost:5000/api/products?page=${currentPage}&limit=${limit}`, {
       cache: "no-store",
     })
 
@@ -39,7 +49,9 @@ export default async function HomePage() {
       throw new Error("Failed to fetch products")
     }
 
-    products = await res.json()
+    const responseData = await res.json()
+    products = Array.isArray(responseData) ? responseData : (responseData.data || [])
+    totalPages = responseData.meta?.totalPages || 0
   } catch (e) {
     console.error("Failed to fetch products:", e)
     error = e
@@ -102,20 +114,23 @@ export default async function HomePage() {
                 </p>
               </div>
             ) : products && products.length > 0 ? (
-              <div className="grid gap-6 sm:grid-cols-2 md:gap-8 lg:grid-cols-3 xl:grid-cols-4">
-                {products.map((product: any) => (
-                  <ProductCard
-                    key={product.id}
-                    id={product.id}
-                    name={product.name}
-                    price={product.price}
-                    unit={product.unit}
-                    image_url={product.image_url}
-                    images={product.images}
-                    stock={product.stock}
-                  />
-                ))}
-              </div>
+              <>
+                <div className="grid gap-6 sm:grid-cols-2 md:gap-8 lg:grid-cols-3 xl:grid-cols-4">
+                  {products.map((product: any) => (
+                    <ProductCard
+                      key={product.id}
+                      id={product.id}
+                      name={product.name}
+                      price={product.price}
+                      unit={product.unit}
+                      image_url={product.image_url}
+                      images={product.images}
+                      stock={product.stock}
+                    />
+                  ))}
+                </div>
+                <PaginationControls totalPages={totalPages} currentPage={currentPage} />
+              </>
             ) : (
               <div className="py-16 text-center">
                 <p className="text-base text-muted-foreground sm:text-lg">

@@ -37,8 +37,9 @@ export function SearchBar() {
                     `http://localhost:5000/api/products?search=${encodeURIComponent(searchQuery)}`
                 )
                 if (res.ok) {
-                    const data = await res.json()
-                    setResults(data.slice(0, 5)) // Show max 5 results
+                    const responseData = await res.json()
+                    const products = Array.isArray(responseData) ? responseData : (responseData.data || [])
+                    setResults(products.slice(0, 5)) // Show max 5 results
                     setShowDropdown(true)
                 }
             } catch (error) {

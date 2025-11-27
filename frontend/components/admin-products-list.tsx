@@ -24,26 +24,18 @@ interface AdminProductsListProps {
 }
 
 export function AdminProductsList({ products }: AdminProductsListProps) {
-    const [searchQuery, setSearchQuery] = useState("")
-
-    const filteredProducts = products.filter((product) =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-
     return (
         <>
             <div className="mb-6">
-                <AdminProductSearch onSearch={setSearchQuery} />
-                {searchQuery && (
-                    <p className="mt-2 text-sm text-muted-foreground">
-                        {filteredProducts.length} produit{filteredProducts.length > 1 ? "s" : ""} trouvé{filteredProducts.length > 1 ? "s" : ""}
-                    </p>
-                )}
+                <AdminProductSearch />
+                <p className="mt-2 text-sm text-muted-foreground">
+                    {products.length} produit{products.length > 1 ? "s" : ""} trouvé{products.length > 1 ? "s" : ""}
+                </p>
             </div>
 
-            {filteredProducts.length > 0 ? (
+            {products.length > 0 ? (
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {filteredProducts.map((product) => {
+                    {products.map((product) => {
                         const formattedPrice = new Intl.NumberFormat("fr-GN", {
                             style: "currency",
                             currency: "GNF",
@@ -92,7 +84,7 @@ export function AdminProductsList({ products }: AdminProductsListProps) {
             ) : (
                 <div className="py-12 text-center">
                     <p className="text-muted-foreground">
-                        {searchQuery ? "Aucun produit trouvé" : "Aucun produit disponible"}
+                        Aucun produit trouvé
                     </p>
                 </div>
             )}

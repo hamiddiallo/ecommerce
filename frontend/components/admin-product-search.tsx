@@ -1,20 +1,38 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
+import { useRouter, useSearchParams } from "next/navigation"
 
-interface AdminProductSearchProps {
-    onSearch: (query: string) => void
-}
+export function AdminProductSearch() {
+    const router = useRouter()
+    const searchParams = useSearchParams()
+    const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "")
 
-export function AdminProductSearch({ onSearch }: AdminProductSearchProps) {
-    const [searchQuery, setSearchQuery] = useState("")
+    // Simple debounce implementation inside component if hook doesn't exist
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            const params = new URLSearchParams(searchParams.toString())
+            const currentQ = params.get("q") || ""
 
-    const handleChange = (value: string) => {
-        setSearchQuery(value)
-        onSearch(value)
-    }
+            // Only update if the query actually changed
+            if (searchQuery !== currentQ) {
+                if (searchQuery) {
+                    params.set("q", searchQuery)
+                } else {
+                    params.delete("q")
+                }
+                // Reset to page 1 on search
+                params.set("page", "1")
+
+                router.push(`?${params.toString()}`)
+            }
+        }, 500)
+
+        return () => clearTimeout(timer)
+    }, [searchQuery, router]) // Removed searchParams from dependencies to prevent loop
+
 
     return (
         <div className="relative w-full max-w-sm">
@@ -24,7 +42,7 @@ export function AdminProductSearch({ onSearch }: AdminProductSearchProps) {
                 placeholder="Rechercher un produit..."
                 className="pl-10"
                 value={searchQuery}
-                onChange={(e) => handleChange(e.target.value)}
+                onChange={(e) => setSearchQuery(e.target.value)}
             />
         </div>
     )

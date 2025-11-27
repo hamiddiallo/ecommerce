@@ -6,24 +6,29 @@ import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { ArrowLeft, Search as SearchIcon } from "lucide-react"
+import { PaginationControls } from "@/components/ui/pagination-controls"
 
 interface SearchPageProps {
     searchParams: Promise<{
         q?: string
+        page?: string
     }>
 }
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
-    const { q } = await searchParams
+    const { q, page } = await searchParams
     const searchQuery = q || ""
+    const currentPage = Number(page) || 1
+    const limit = 12
 
     let products = []
+    let totalPages = 0
     let error = null
 
     if (searchQuery) {
         try {
             const res = await fetch(
-                `http://localhost:5000/api/products?search=${encodeURIComponent(searchQuery)}`,
+                `http://localhost:5000/api/products?search=${encodeURIComponent(searchQuery)}&page=${currentPage}&limit=${limit}`,
                 { cache: "no-store" }
             )
 
@@ -31,7 +36,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 throw new Error("Failed to fetch products")
             }
 
-            products = await res.json()
+            const responseData = await res.json()
+            products = Array.isArray(responseData) ? responseData : (responseData.data || [])
+            totalPages = responseData.meta?.totalPages || 0
         } catch (e) {
             console.error("Failed to fetch products:", e)
             error = e
@@ -78,19 +85,22 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                             </p>
                         </div>
                     ) : products.length > 0 ? (
-                        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                            {products.map((product: any) => (
-                                <ProductCard
-                                    key={product.id}
-                                    id={product.id}
-                                    name={product.name}
-                                    price={product.price}
-                                    unit={product.unit}
-                                    image_url={product.image_url}
-                                    stock={product.stock}
-                                />
-                            ))}
-                        </div>
+                        <>
+                            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                                {products.map((product: any) => (
+                                    <ProductCard
+                                        key={product.id}
+                                        id={product.id}
+                                        name={product.name}
+                                        price={product.price}
+                                        unit={product.unit}
+                                        image_url={product.image_url}
+                                        stock={product.stock}
+                                    />
+                                ))}
+                            </div>
+                            <PaginationControls totalPages={totalPages} currentPage={currentPage} />
+                        </>
                     ) : (
                         <div className="flex flex-col items-center justify-center py-12 text-center">
                             <SearchIcon className="mb-4 h-16 w-16 text-muted-foreground" />

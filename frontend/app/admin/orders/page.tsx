@@ -5,6 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { PaginationControls } from "@/components/ui/pagination-controls"
+
+const ITEMS_PER_PAGE = 10
 
 export default async function AdminOrdersPage({
   searchParams,
@@ -15,19 +18,30 @@ export default async function AdminOrdersPage({
   const supabase = await createServerSupabaseClient()
   if (!supabase) throw new Error("❌ Supabase client not configured")
 
-  // Récupérer le filtre de statut depuis les paramètres de recherche
-  const { status } = await searchParams
+  // Récupérer les paramètres
+  const { status, page } = await searchParams
   const statusFilter = (status as string) || "all"
+  const currentPage = Number(page) || 1
 
-  // Construire la requête en fonction du filtre
-  let query = supabase.from("orders").select("*").order("created_at", { ascending: false })
+  // Calculer la plage de données pour la pagination
+  const from = (currentPage - 1) * ITEMS_PER_PAGE
+  const to = from + ITEMS_PER_PAGE - 1
+
+  // Construire la requête de base
+  let query = supabase
+    .from("orders")
+    .select("*", { count: "exact" })
+    .order("created_at", { ascending: false })
 
   // Appliquer le filtre si différent de "all"
   if (statusFilter !== "all") {
     query = query.eq("status", statusFilter)
   }
 
-  const { data: orders } = await query
+  // Appliquer la pagination
+  const { data: orders, count } = await query.range(from, to)
+
+  const totalPages = count ? Math.ceil(count / ITEMS_PER_PAGE) : 0
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
@@ -84,49 +98,53 @@ export default async function AdminOrdersPage({
           </div>
 
           {orders && orders.length > 0 ? (
-            <div className="space-y-4">
-              {orders.map((order) => {
-                const formattedTotal = new Intl.NumberFormat("fr-GN", {
-                  style: "currency",
-                  currency: "GNF",
-                  minimumFractionDigits: 0,
-                }).format(order.total)
+            <>
+              <div className="space-y-4">
+                {orders.map((order) => {
+                  const formattedTotal = new Intl.NumberFormat("fr-GN", {
+                    style: "currency",
+                    currency: "GNF",
+                    minimumFractionDigits: 0,
+                  }).format(order.total)
 
-                const formattedDate = new Date(order.created_at).toLocaleDateString("fr-FR", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })
+                  const formattedDate = new Date(order.created_at).toLocaleDateString("fr-FR", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
 
-                return (
-                  <Card key={order.id}>
-                    <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <CardTitle className="text-lg">Commande #{order.id.slice(0, 8)}</CardTitle>
-                          <p className="text-sm text-muted-foreground">{formattedDate}</p>
+                  return (
+                    <Card key={order.id}>
+                      <CardHeader>
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <CardTitle className="text-lg">Commande #{order.id.slice(0, 8)}</CardTitle>
+                            <p className="text-sm text-muted-foreground">{formattedDate}</p>
+                          </div>
+                          {getStatusBadge(order.status)}
                         </div>
-                        {getStatusBadge(order.status)}
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium">{order.full_name}</p>
-                          <p className="text-sm text-muted-foreground">{order.phone}</p>
-                          <p className="mt-2 text-xl font-bold text-primary">{formattedTotal}</p>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-medium">{order.full_name}</p>
+                            <p className="text-sm text-muted-foreground">{order.phone}</p>
+                            <p className="mt-2 text-xl font-bold text-primary">{formattedTotal}</p>
+                          </div>
+                          <Button asChild variant="outline" className="bg-transparent">
+                            <Link href={`/admin/orders/${order.id}`}>Voir les détails</Link>
+                          </Button>
                         </div>
-                        <Button asChild variant="outline" className="bg-transparent">
-                          <Link href={`/admin/orders/${order.id}`}>Voir les détails</Link>
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )
-              })}
-            </div>
+                      </CardContent>
+                    </Card>
+                  )
+                })}
+              </div>
+
+              <PaginationControls totalPages={totalPages} currentPage={currentPage} />
+            </>
           ) : (
             <Card>
               <CardContent className="py-12 text-center">

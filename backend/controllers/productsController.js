@@ -2,11 +2,14 @@ const supabase = require('../config/supabase');
 
 async function getProducts(req, res) {
     try {
-        const { search } = req.query;
+        const { search, page = 1, limit = 12 } = req.query;
+
+        const from = (page - 1) * limit;
+        const to = from + limit - 1;
 
         let query = supabase
             .from('products')
-            .select('*');
+            .select('*', { count: 'exact' });
 
         // Add search filter if search term provided
         if (search) {
@@ -14,10 +17,21 @@ async function getProducts(req, res) {
             query = query.ilike('name', `%${search}%`);
         }
 
-        const { data, error } = await query.order('created_at', { ascending: false });
+        const { data, error, count } = await query
+            .order('created_at', { ascending: false })
+            .range(from, to);
 
         if (error) throw error;
-        res.json(data);
+
+        res.json({
+            data,
+            meta: {
+                total: count,
+                page: Number(page),
+                limit: Number(limit),
+                totalPages: Math.ceil(count / limit)
+            }
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

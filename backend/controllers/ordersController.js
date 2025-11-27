@@ -83,18 +83,36 @@ async function createOrder(req, res) {
 }
 
 async function getOrders(req, res) {
-    const { userId } = req.query;
+    const { userId, page = 1, limit = 10, status } = req.query;
     if (!userId) return res.status(400).json({ error: 'User ID required' });
 
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
     try {
-        const { data, error } = await supabase
+        let query = supabase
             .from('orders')
-            .select('*, order_items(*, products(name, image_url))')
+            .select('*, order_items(*, products(name, image_url))', { count: 'exact' })
             .eq('user_id', userId)
             .order('created_at', { ascending: false });
 
+        if (status && status !== 'all') {
+            query = query.eq('status', status);
+        }
+
+        const { data, error, count } = await query.range(from, to);
+
         if (error) throw error;
-        res.json(data);
+
+        res.json({
+            data,
+            meta: {
+                total: count,
+                page: Number(page),
+                limit: Number(limit),
+                totalPages: Math.ceil(count / limit)
+            }
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

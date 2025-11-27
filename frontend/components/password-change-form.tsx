@@ -1,14 +1,15 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
-import { Loader2, Lock, ArrowLeft } from "lucide-react"
+import { Loader2, Lock, ArrowLeft, Info } from "lucide-react"
 import Link from "next/link"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 export function PasswordChangeForm() {
     const [passwords, setPasswords] = useState({
@@ -17,6 +18,27 @@ export function PasswordChangeForm() {
         confirmPassword: "",
     })
     const [isLoading, setIsLoading] = useState(false)
+    const [isGoogleUser, setIsGoogleUser] = useState(false)
+    const [checkingUser, setCheckingUser] = useState(true)
+
+    useEffect(() => {
+        checkUserProvider()
+    }, [])
+
+    const checkUserProvider = async () => {
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+
+        if (user) {
+            // Check if user is logged in via Google
+            // Supabase stores provider info in app_metadata or identities
+            const isGoogle = user.app_metadata.provider === 'google' ||
+                user.identities?.some(id => id.provider === 'google')
+
+            setIsGoogleUser(!!isGoogle)
+        }
+        setCheckingUser(false)
+    }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setPasswords({ ...passwords, [e.target.name]: e.target.value })
@@ -60,6 +82,14 @@ export function PasswordChangeForm() {
         }
     }
 
+    if (checkingUser) {
+        return (
+            <div className="flex justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        )
+    }
+
     return (
         <>
             <Button variant="ghost" asChild className="mb-6">
@@ -85,56 +115,67 @@ export function PasswordChangeForm() {
                 </CardHeader>
 
                 <CardContent>
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="currentPassword">Mot de passe actuel</Label>
-                            <Input
-                                id="currentPassword"
-                                name="currentPassword"
-                                type="password"
-                                placeholder="••••••••"
-                                value={passwords.currentPassword}
-                                onChange={handleChange}
-                                required
-                                disabled={isLoading}
-                            />
-                        </div>
+                    {isGoogleUser ? (
+                        <Alert className="bg-blue-50 border-blue-200 text-blue-800">
+                            <Info className="h-4 w-4 text-blue-600" />
+                            <AlertTitle className="text-blue-800 font-semibold">Modification impossible</AlertTitle>
+                            <AlertDescription className="text-blue-700 mt-2">
+                                Vous êtes connecté avec votre compte <strong>Google</strong>.
+                                Votre mot de passe est géré directement par Google et ne peut pas être modifié ici.
+                            </AlertDescription>
+                        </Alert>
+                    ) : (
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="currentPassword">Mot de passe actuel</Label>
+                                <Input
+                                    id="currentPassword"
+                                    name="currentPassword"
+                                    type="password"
+                                    placeholder="••••••••"
+                                    value={passwords.currentPassword}
+                                    onChange={handleChange}
+                                    required
+                                    disabled={isLoading}
+                                />
+                            </div>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="newPassword">Nouveau mot de passe</Label>
-                            <Input
-                                id="newPassword"
-                                name="newPassword"
-                                type="password"
-                                placeholder="Minimum 6 caractères"
-                                value={passwords.newPassword}
-                                onChange={handleChange}
-                                required
-                                disabled={isLoading}
-                                minLength={6}
-                            />
-                        </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="newPassword">Nouveau mot de passe</Label>
+                                <Input
+                                    id="newPassword"
+                                    name="newPassword"
+                                    type="password"
+                                    placeholder="Minimum 6 caractères"
+                                    value={passwords.newPassword}
+                                    onChange={handleChange}
+                                    required
+                                    disabled={isLoading}
+                                    minLength={6}
+                                />
+                            </div>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="confirmPassword">Confirmer le nouveau mot de passe</Label>
-                            <Input
-                                id="confirmPassword"
-                                name="confirmPassword"
-                                type="password"
-                                placeholder="Retapez le nouveau mot de passe"
-                                value={passwords.confirmPassword}
-                                onChange={handleChange}
-                                required
-                                disabled={isLoading}
-                                minLength={6}
-                            />
-                        </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="confirmPassword">Confirmer le nouveau mot de passe</Label>
+                                <Input
+                                    id="confirmPassword"
+                                    name="confirmPassword"
+                                    type="password"
+                                    placeholder="Retapez le nouveau mot de passe"
+                                    value={passwords.confirmPassword}
+                                    onChange={handleChange}
+                                    required
+                                    disabled={isLoading}
+                                    minLength={6}
+                                />
+                            </div>
 
-                        <Button type="submit" className="w-full" disabled={isLoading}>
-                            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Mettre à jour le mot de passe
-                        </Button>
-                    </form>
+                            <Button type="submit" className="w-full" disabled={isLoading}>
+                                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                Mettre à jour le mot de passe
+                            </Button>
+                        </form>
+                    )}
                 </CardContent>
             </Card>
         </>

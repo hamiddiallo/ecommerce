@@ -10,6 +10,7 @@ import { Minus, Plus, Trash2 } from "lucide-react"
 import { updateCartQuantity, removeFromCart } from "@/lib/cart-actions"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { normalizeImageUrl } from "@/lib/image-url"
 
 interface CartItemProps {
   id: string
@@ -124,23 +125,23 @@ export function CartItem({ id, product, quantity }: CartItemProps) {
 
   return (
     <Card>
-      <CardContent className="p-4">
-        <div className="flex gap-4">
-          <Link href={`/product/${product.id}`} className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-md">
-            <Image src={product.image_url || "/placeholder.svg"} alt={product.name} fill className="object-cover" />
+      <CardContent className="p-3 sm:p-4">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+          <Link href={`/product/${product.id}`} className="relative h-20 w-20 sm:h-24 sm:w-24 flex-shrink-0 overflow-hidden rounded-md mx-auto sm:mx-0">
+            <Image src={normalizeImageUrl(product.image_url)} alt={product.name} fill className="object-cover" />
           </Link>
 
-          <div className="flex flex-1 flex-col justify-between">
+          <div className="flex flex-1 flex-col justify-between gap-3">
             <div>
-              <Link href={`/product/${product.id}`} className="font-medium hover:text-primary">
+              <Link href={`/product/${product.id}`} className="font-medium hover:text-primary text-sm sm:text-base line-clamp-2">
                 {product.name}
               </Link>
-              <p className="mt-1 text-sm text-muted-foreground">
+              <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
                 {formattedPrice} / {product.unit}
               </p>
             </div>
 
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
@@ -157,7 +158,7 @@ export function CartItem({ id, product, quantity }: CartItemProps) {
                   onChange={handleInputChange}
                   onBlur={handleBlur}
                   onKeyDown={handleKeyDown}
-                  className="h-8 w-16 text-center"
+                  className="h-8 w-14 sm:w-16 text-center text-sm"
                   min={1}
                   max={product.stock}
                   disabled={isUpdating}
@@ -173,8 +174,8 @@ export function CartItem({ id, product, quantity }: CartItemProps) {
                 </Button>
               </div>
 
-              <div className="flex items-center gap-4">
-                <span className="font-semibold">{formattedTotal}</span>
+              <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto justify-between sm:justify-end">
+                <span className="font-semibold text-sm sm:text-base">{formattedTotal}</span>
                 <Button variant="ghost" size="icon" onClick={handleRemove} disabled={isUpdating}>
                   <Trash2 className="h-4 w-4 text-destructive" />
                 </Button>

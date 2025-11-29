@@ -39,7 +39,7 @@ export default function AdminDashboard() {
   }, [])
 
   async function fetchDashboard() {
-    const API_URL = "http://localhost:5000/api";
+    const API_URL = "/api";
 
     // 1️⃣ Totals
     const statsRes = await fetch(`${API_URL}/admin/stats`);

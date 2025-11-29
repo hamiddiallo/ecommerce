@@ -6,6 +6,7 @@ import { Search, Loader2 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
 import Image from "next/image"
+import { normalizeImageUrl } from "@/lib/image-url"
 
 interface Product {
     id: string
@@ -34,7 +35,7 @@ export function SearchBar() {
         const timer = setTimeout(async () => {
             try {
                 const res = await fetch(
-                    `http://localhost:5000/api/products?search=${encodeURIComponent(searchQuery)}`
+                    `/api/products?search=${encodeURIComponent(searchQuery)}`
                 )
                 if (res.ok) {
                     const responseData = await res.json()
@@ -115,7 +116,7 @@ export function SearchBar() {
                             >
                                 <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded bg-muted">
                                     <Image
-                                        src={product.image_url || "/placeholder.svg"}
+                                        src={normalizeImageUrl(product.image_url)}
                                         alt={product.name}
                                         fill
                                         className="object-cover"

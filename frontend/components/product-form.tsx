@@ -74,19 +74,30 @@ export function ProductForm({ categories, product }: ProductFormProps) {
         uploadFormData.append("file", file)
 
         try {
-          const uploadResponse = await fetch("http://localhost:5000/api/upload", {
+          const uploadResponse = await fetch("/api/upload", {
             method: "POST",
             body: uploadFormData,
           })
 
+          if (!uploadResponse.ok) {
+            // Attempt to parse error message from response if available
+            const errorData = await uploadResponse.json().catch(() => ({ error: "Unknown error" }));
+            toast.error(`Erreur upload ${file.name}`, { description: errorData.error || "Erreur lors de l'upload de l'image" });
+            continue; // Skip to the next file
+          }
+
           const uploadResult = await uploadResponse.json()
+          // Use relative path for image URL as well, or full URL if needed.
+          // Since we are storing the path, let's keep it relative or construct it properly.
+          // If the backend returns a relative path like '/uploads/image.jpg', we might need to prepend the API URL or just use it as is if we have a proxy for /uploads.
+          // We added a proxy for /uploads in next.config.mjs! So we can just use the path.
           if (uploadResult.error) {
             toast.error(`Erreur upload ${file.name}`, { description: uploadResult.error })
             continue
           }
 
           // Add uploaded image URL to formData
-          formData.append("images", `http://localhost:5000${uploadResult.filePath}`)
+          formData.append("images", uploadResult.filePath)
         } catch (error) {
           console.error("Upload error:", error)
           toast.error(`Erreur upload ${file.name}`)

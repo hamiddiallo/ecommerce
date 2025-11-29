@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
 import { Pencil } from "lucide-react"
+import { normalizeImageUrl } from "@/lib/image-url"
 import { DeleteProductButton } from "@/components/delete-product-button"
 import { AdminProductSearch } from "@/components/admin-product-search"
 
@@ -46,7 +47,7 @@ export function AdminProductsList({ products }: AdminProductsListProps) {
                             <Card key={product.id}>
                                 <div className="relative aspect-square overflow-hidden bg-muted">
                                     <Image
-                                        src={product.image_url || "/placeholder.svg"}
+                                        src={normalizeImageUrl(product.image_url)}
                                         alt={product.name}
                                         fill
                                         className="object-cover"

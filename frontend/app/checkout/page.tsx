@@ -4,7 +4,8 @@ import { CategoryNav } from "@/components/category-nav";
 import { Footer } from "@/components/footer";
 import { CheckoutForm } from "@/components/checkout-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { redirect } from "next/navigation";
+import { redirect } from "next/navigation"
+import { normalizeImageUrl } from "@/lib/image-url";
 import Image from "next/image";
 
 export default async function CheckoutPage() {
@@ -84,7 +85,7 @@ export default async function CheckoutPage() {
                       <div key={item.id} className="flex gap-3">
                         <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md">
                           <Image
-                            src={item.products.image_url || "/placeholder.svg"}
+                            src={normalizeImageUrl(item.products.image_url)}
                             alt={item.products.name}
                             fill
                             className="object-cover"

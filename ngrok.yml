@@ -1,0 +1,10 @@
+version: "2"
+authtoken: 369vAyP5OsONin2Z5gDtxVKHqHy_YmkazDgx7UV99ReUWQFi
+tunnels:
+  frontend:
+    addr: 3000
+    proto: http
+    hostname: lauren-ahistoric-predesirously.ngrok-free.dev
+  backend:
+    addr: 5000
+    proto: tcp

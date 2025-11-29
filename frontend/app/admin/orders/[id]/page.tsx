@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { OrderStatusSelect } from "@/components/order-status-select"
 import Link from "next/link"
 import { notFound } from "next/navigation"
+import { normalizeImageUrl } from "@/lib/image-url"
 import { ArrowLeft } from "lucide-react"
 import Image from "next/image"
 
@@ -117,7 +118,7 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
                     >
                       <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-md">
                         <Image
-                          src={item.products?.image_url || "/placeholder.svg"}
+                          src={normalizeImageUrl(item.products?.image_url)}
                           alt={item.product_name}
                           fill
                           className="object-cover"

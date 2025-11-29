@@ -7,6 +7,8 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { AddToCartButton } from "@/components/add-to-cart-button"
 import { cn } from "@/lib/utils"
 
+import { normalizeImageUrl } from "@/lib/image-url"
+
 interface ProductCardProps {
   id: string
   name: string
@@ -22,7 +24,7 @@ export function ProductCard({ id, name, price, unit, image_url, images, stock }:
   const [isHovered, setIsHovered] = useState(false)
 
   // Use images array if available and has items, otherwise fallback to image_url wrapped in array
-  const productImages = images && images.length > 0 ? images : [image_url || "/placeholder.svg"]
+  const productImages = images && images.length > 0 ? images.map(normalizeImageUrl) : [normalizeImageUrl(image_url)]
 
   useEffect(() => {
     // Only auto-scroll if there are multiple images and not currently hovered (optional: or always)

@@ -10,6 +10,7 @@ import { notFound, redirect } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
 import Image from "next/image"
 import OrderActions from "@/components/order-actions"
+import { normalizeImageUrl } from "@/lib/image-url"
 
 //
 // ✅ Interfaces pour typer les données Supabase
@@ -91,7 +92,8 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
     cache: "no-store",
   })
 
-  const orders = res.ok ? await res.json() : []
+  const responseData = res.ok ? await res.json() : { data: [] }
+  const orders = Array.isArray(responseData) ? responseData : (responseData.data || [])
   const order = orders.find((o: any) => o.id === id) as Order | undefined
 
   if (!order) {
@@ -178,7 +180,7 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
                     <div key={item.id} className="flex gap-4 border-b pb-4 last:border-0 last:pb-0">
                       <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-md">
                         <Image
-                          src={item.products?.image_url || "/placeholder.svg"}
+                          src={normalizeImageUrl(item.products?.image_url)}
                           alt={item.product_name}
                           fill
                           className="object-cover"

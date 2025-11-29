@@ -1,4 +1,7 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const isServer = typeof window === 'undefined';
+const API_URL = isServer
+    ? (process.env.NEXT_PUBLIC_API_URL?.startsWith('http') ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api')
+    : (process.env.NEXT_PUBLIC_API_URL || '/api');
 
 interface FetchOptions extends RequestInit {
     headers?: Record<string, string>;

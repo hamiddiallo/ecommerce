@@ -93,6 +93,11 @@ export async function Header() {
           )}
         </div>
       </div>
+
+      {/* Mobile Search Bar */}
+      <div className="border-t p-4 md:hidden">
+        <SearchBar />
+      </div>
     </header>
   )
 }

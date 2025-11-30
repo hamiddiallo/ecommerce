@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { AlertTriangle } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
+import { normalizeImageUrl } from "@/lib/image-url"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
@@ -87,7 +88,7 @@ export function AdminCriticalStock() {
                                     <div className="flex items-center gap-3">
                                         <div className="h-10 w-10 overflow-hidden rounded bg-muted flex-shrink-0">
                                             {product.image_url && (
-                                                <img src={product.image_url} alt={product.name} className="h-full w-full object-cover" />
+                                                <img src={normalizeImageUrl(product.image_url)} alt={product.name} className="h-full w-full object-cover" />
                                             )}
                                         </div>
                                         <div className="min-w-0 flex-1">

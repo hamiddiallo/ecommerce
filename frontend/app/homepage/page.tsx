@@ -4,6 +4,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
+import { normalizeImageUrl } from "@/lib/image-url"
 import { Swiper, SwiperSlide } from "swiper/react"
 import { Navigation, Autoplay } from "swiper/modules"
 import "swiper/css"
@@ -128,7 +129,7 @@ export default function HomePage() {
                                 <SwiperSlide key={p.product_id}>
                                     <div className="border rounded-xl p-6 bg-white shadow hover:shadow-xl transition flex flex-col items-center">
                                         {p.image_url ? (
-                                            <img src={p.image_url} alt={p.product_name} className="h-60 w-full object-cover rounded-md mb-4" />
+                                            <img src={normalizeImageUrl(p.image_url)} alt={p.product_name} className="h-60 w-full object-cover rounded-md mb-4" />
                                         ) : (
                                             <div className="h-60 w-full bg-gray-200 rounded-md mb-4 flex items-center justify-center">
                                                 <span className="text-gray-500">Pas d'image</span>
@@ -149,7 +150,7 @@ export default function HomePage() {
                 <div className="container mx-auto px-6 flex flex-col md:flex-row items-center gap-12">
                     <div className="md:w-1/2">
                         <img
-                            src="koto.jpeg"
+                            src={normalizeImageUrl("koto.jpeg")}
                             alt="Gérant ETS MLF"
                             className="rounded-xl shadow-lg w-full object-cover h-80 md:h-full"
                         />

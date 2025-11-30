@@ -23,6 +23,7 @@ app.use('/api/upload', require('./routes/upload'));
 app.use('/api/cart', require('./routes/cart'));
 app.use('/api/orders', require('./routes/orders'));
 app.use('/api/admin', require('./routes/admin'));
+app.use('/api/favorites', require('./routes/favoritesRoutes'));
 
 // Base route
 app.get('/', (req, res) => {

@@ -68,7 +68,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           <div className="container px-4 py-16 sm:px-6 md:py-24 lg:px-8">
             <div className="mx-auto max-w-4xl text-center">
               <h1 className="text-balance text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-                Bienvenue sur Boutique Guinée
+                Bienvenue chez Mouctar DH Distribution
               </h1>
               <p className="mx-auto mt-6 max-w-2xl text-pretty text-base text-muted-foreground sm:text-lg md:text-xl">
                 Découvrez notre large sélection de produits de qualité : cosmétiques, hygiène, fournitures scolaires,

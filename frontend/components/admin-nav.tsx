@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { LayoutDashboard, Package, ShoppingBag, LogOut, ExternalLink } from "lucide-react"
+import { LayoutDashboard, Package, ShoppingBag, LogOut, ExternalLink, FolderTree } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { LogoutButton } from "./logout-button"
 
@@ -28,6 +28,12 @@ export function AdminNav() {
               <Link href="/admin/products">
                 <Package className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline">Produits</span>
+              </Link>
+            </Button>
+            <Button variant="ghost" size="sm" asChild className="h-9">
+              <Link href="/admin/categories">
+                <FolderTree className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Catégories</span>
               </Link>
             </Button>
             <Button variant="ghost" size="sm" asChild className="h-9">

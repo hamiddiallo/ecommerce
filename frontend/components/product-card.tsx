@@ -5,6 +5,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { AddToCartButton } from "@/components/add-to-cart-button"
+import { FavoriteButton } from "@/components/favorite-button"
 import { cn } from "@/lib/utils"
 
 import { normalizeImageUrl } from "@/lib/image-url"
@@ -66,6 +67,9 @@ export function ProductCard({ id, name, price, unit, image_url, images, stock }:
               isHovered ? "scale-105" : "scale-100"
             )}
           />
+
+          {/* Favorite Button */}
+          <FavoriteButton productId={id} />
 
           {/* Carousel Indicators */}
           {productImages.length > 1 && (

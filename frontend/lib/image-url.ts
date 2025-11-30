@@ -21,10 +21,11 @@ export function normalizeImageUrl(url: string | null | undefined): string {
         return url
     }
 
-    // If it doesn't start with /, add it (assume it's a relative path)
-    if (!url.startsWith("/")) {
-        return `/uploads/${url}`
+    // If it starts with / but not /uploads/, add /uploads prefix
+    if (url.startsWith("/")) {
+        return `/uploads${url}`
     }
 
-    return url
+    // If it doesn't start with /, add /uploads/ prefix
+    return `/uploads/${url}`
 }

@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { User, Package } from "lucide-react"
+import { User, Package, Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { LogoutButton } from "@/components/logout-button"
 
@@ -39,6 +39,13 @@ export function UserMenu() {
                     <Link href="/orders">
                         <Package className="mr-2 h-4 w-4" />
                         Mes commandes
+                    </Link>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem asChild>
+                    <Link href="/favorites">
+                        <Heart className="mr-2 h-4 w-4" />
+                        Mes favoris
                     </Link>
                 </DropdownMenuItem>
 

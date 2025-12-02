@@ -1,0 +1,29 @@
+# Root-level gitignore for ecommerce-guinea project
+
+# Environment variables
+.env
+.env.local
+.env*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+
+# Documentation artifacts (internal)
+.gemini/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/

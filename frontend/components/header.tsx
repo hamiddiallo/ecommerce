@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ShoppingCart, LogIn, UserPlus, Home } from "lucide-react"
+import { ShoppingCart, LogIn, UserPlus, Home, LayoutDashboard } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { CartIcon } from "@/components/cart-icon"
 import { Suspense } from "react"
@@ -50,14 +50,24 @@ export async function Header() {
         <div className="flex items-center gap-1 sm:gap-2">
           {/* Home Button */}
           <Button variant="ghost" size="sm" asChild className="h-9">
-            <Link href="/homepage">
+            <Link href="/">
               <Home className="h-4 w-4 sm:mr-2" />
               <span className="hidden sm:inline">Accueil</span>
             </Link>
           </Button>
 
-          {/* User Menu for authenticated non-admin users */}
-          {isAuthenticated && !isAdmin && <UserMenu />}
+          {/* Admin Dashboard Link */}
+          {isAdmin && (
+            <Button variant="ghost" size="sm" asChild className="h-9 text-primary font-medium">
+              <Link href="/admin">
+                <LayoutDashboard className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Admin</span>
+              </Link>
+            </Button>
+          )}
+
+          {/* User Menu for authenticated users (including admins) */}
+          {isAuthenticated && <UserMenu />}
 
           {/* Cart Icon for authenticated non-admin users */}
           {isAuthenticated && (

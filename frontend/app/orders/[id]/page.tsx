@@ -67,6 +67,9 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
     redirect("/auth/login")
   }
 
+  const { data: { session } } = await supabase.auth.getSession()
+  const token = session?.access_token
+
   //
   // ✅ Requête typée
   //
@@ -90,6 +93,9 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
 
   const res = await fetch(`http://localhost:5000/api/orders?userId=${user.id}`, {
     cache: "no-store",
+    headers: token ? {
+      Authorization: `Bearer ${token}`
+    } : undefined
   })
 
   const responseData = res.ok ? await res.json() : { data: [] }

@@ -1,8 +1,10 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Printer } from "lucide-react"
+import { Share2 } from "lucide-react"
 import Image from "next/image"
+import { useState } from "react"
+import { createClient } from "@/lib/supabase/client"
 
 interface OrderItem {
     id: string
@@ -71,8 +73,66 @@ function numberToWords(num: number): string {
 }
 
 export function Invoice({ order }: InvoiceProps) {
-    const handlePrint = () => {
-        window.print()
+    const [isSharing, setIsSharing] = useState(false)
+
+    const getPDFBlob = async () => {
+        const supabase = createClient()
+        const { data: { session } } = await supabase.auth.getSession()
+        const token = session?.access_token
+
+        if (!token) {
+            throw new Error("Non authentifié")
+        }
+
+        const response = await fetch(`/api/orders/${order.id}/pdf`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+
+        if (!response.ok) {
+            throw new Error('Erreur lors du téléchargement')
+        }
+
+        return await response.blob()
+    }
+
+    const handleSharePDF = async () => {
+        setIsSharing(true)
+        try {
+            // Check if Web Share API is supported
+            if (typeof navigator.share === 'undefined') {
+                alert("Le partage n'est pas supporté sur cet appareil.")
+                return
+            }
+
+            const blob = await getPDFBlob()
+            const file = new File(
+                [blob],
+                `Facture-${order.invoice_number || order.id}.pdf`,
+                { type: 'application/pdf' }
+            )
+
+            // Check if files can be shared
+            if (navigator.canShare && !navigator.canShare({ files: [file] })) {
+                alert("Le partage de fichiers n'est pas supporté sur cet appareil")
+                return
+            }
+
+            await navigator.share({
+                title: `Facture ${order.invoice_number || order.id}`,
+                text: `Facture pour ${order.full_name}`,
+                files: [file]
+            })
+        } catch (error: any) {
+            // User cancelled or error occurred
+            if (error.name !== 'AbortError') {
+                console.error('Share error:', error)
+                alert('Erreur lors du partage')
+            }
+        } finally {
+            setIsSharing(false)
+        }
     }
 
     // Utiliser le numéro de facture fourni ou générer un par défaut
@@ -87,11 +147,11 @@ export function Invoice({ order }: InvoiceProps) {
 
     return (
         <div className="min-h-screen bg-white">
-            {/* Print Button - Hidden when printing */}
+            {/* Share Button - Hidden when printing */}
             <div className="print:hidden fixed top-4 right-4 z-50">
-                <Button onClick={handlePrint} size="lg" className="shadow-lg">
-                    <Printer className="mr-2 h-4 w-4" />
-                    Imprimer
+                <Button onClick={handleSharePDF} size="lg" className="shadow-lg bg-green-600 hover:bg-green-700" disabled={isSharing}>
+                    <Share2 className="mr-2 h-4 w-4" />
+                    {isSharing ? "Partage..." : "Partager"}
                 </Button>
             </div>
 
@@ -215,25 +275,36 @@ export function Invoice({ order }: InvoiceProps) {
                 }
                 
                 @media print {
-                    body {
+                    /* Remove browser headers/footers */
+                    @page {
+                        size: A4;
+                        margin: 0;
+                    }
+                    
+                    html, body {
+                        margin: 0;
+                        padding: 0;
                         print-color-adjust: exact;
                         -webkit-print-color-adjust: exact;
                     }
+                    
                     .print\\:hidden {
                         display: none !important;
                     }
+                    
                     .invoice-wrapper {
                         padding: 0;
+                        margin: 0;
                     }
+                    
                     .invoice-content {
                         transform: none;
                         width: 100%;
-                        padding: 0.3cm 0.5cm; /* Minimal margins for print */
+                        max-width: 100%;
+                        margin: 0.5cm;
+                        padding: 0;
                     }
-                    @page {
-                        size: A4;
-                        margin: 0.3cm 0.5cm; /* Minimal page margins */
-                    }
+                    
                     /* Ensure table rows don't break across pages */
                     tr {
                         page-break-inside: avoid;

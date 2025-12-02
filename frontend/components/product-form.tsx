@@ -74,9 +74,12 @@ export function ProductForm({ categories, product }: ProductFormProps) {
         uploadFormData.append("file", file)
 
         try {
-          const uploadResponse = await fetch("/api/upload", {
+          // Use apiFetch to ensure proper authentication and routing
+          const { apiFetch } = await import("@/lib/api")
+          const uploadResponse = await apiFetch("/upload", {
             method: "POST",
             body: uploadFormData,
+            // Don't set Content-Type header, let browser set it with boundary for multipart/form-data
           })
 
           if (!uploadResponse.ok) {

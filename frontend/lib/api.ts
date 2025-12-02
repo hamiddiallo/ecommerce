@@ -20,10 +20,12 @@ function getApiUrl(): string {
  * Get authentication headers with Supabase JWT token
  * Only works on client-side
  */
-async function getAuthHeaders(): Promise<HeadersInit> {
-    const headers: HeadersInit = {
-        'Content-Type': 'application/json',
-    }
+/**
+ * Get authentication headers with Supabase JWT token
+ * Only works on client-side
+ */
+async function getAuthHeaders(): Promise<Record<string, string>> {
+    const headers: Record<string, string> = {}
 
     // Only try to get auth token on client-side
     if (typeof window !== "undefined") {
@@ -52,12 +54,25 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
     const url = `${getApiUrl()}${endpoint}`
     const authHeaders = await getAuthHeaders()
 
+    // Merge headers
+    const headers = {
+        ...authHeaders,
+        ...(options.headers as Record<string, string>),
+    }
+
+    // Set default Content-Type to application/json if not set and body is not FormData
+    if (!headers['Content-Type'] && !(options.body instanceof FormData)) {
+        headers['Content-Type'] = 'application/json'
+    }
+
+    // If body is FormData, ensure Content-Type is NOT set (browser sets it with boundary)
+    if (options.body instanceof FormData) {
+        delete headers['Content-Type']
+    }
+
     const mergedOptions: RequestInit = {
         ...options,
-        headers: {
-            ...authHeaders,
-            ...options.headers,
-        },
+        headers,
     }
 
     return fetch(url, mergedOptions)

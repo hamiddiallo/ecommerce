@@ -1,9 +1,21 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
+import { createServerSupabaseClient } from "@/lib/supabase/server"
 
 // Server actions always run on the server, so we need absolute URL
 const API_URL = 'http://localhost:5000/api'
+
+/**
+ * Get auth token from server-side Supabase session
+ */
+async function getAuthToken() {
+    const supabase = await createServerSupabaseClient()
+    if (!supabase) return null
+
+    const { data: { session } } = await supabase.auth.getSession()
+    return session?.access_token || null
+}
 
 export async function createCategory(formData: FormData) {
     try {
@@ -15,10 +27,16 @@ export async function createCategory(formData: FormData) {
             return { error: "Le nom et le slug sont requis" }
         }
 
+        const token = await getAuthToken()
+        if (!token) {
+            return { error: "Non authentifié" }
+        }
+
         const res = await fetch(`${API_URL}/categories`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`,
             },
             body: JSON.stringify({ name, slug, description }),
         })
@@ -52,10 +70,16 @@ export async function updateCategory(id: string, formData: FormData) {
             return { error: "Le nom et le slug sont requis" }
         }
 
+        const token = await getAuthToken()
+        if (!token) {
+            return { error: "Non authentifié" }
+        }
+
         const res = await fetch(`${API_URL}/categories/${id}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`,
             },
             body: JSON.stringify({ name, slug, description }),
         })
@@ -81,8 +105,16 @@ export async function updateCategory(id: string, formData: FormData) {
 
 export async function deleteCategory(id: string) {
     try {
+        const token = await getAuthToken()
+        if (!token) {
+            return { error: "Non authentifié" }
+        }
+
         const res = await fetch(`${API_URL}/categories/${id}`, {
             method: "DELETE",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+            },
         })
 
         if (!res.ok) {

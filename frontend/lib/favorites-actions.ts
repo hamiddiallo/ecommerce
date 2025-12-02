@@ -125,7 +125,9 @@ export async function checkFavorite(userId: string, productId: string) {
         })
 
         if (!res.ok) {
-            throw new Error("Failed to check favorite")
+            // Log error but don't throw to avoid breaking UI
+            console.error(`Failed to check favorite for product ${productId}: ${res.status}`)
+            return false
         }
 
         const data = await res.json()

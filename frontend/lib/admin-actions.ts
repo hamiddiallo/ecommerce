@@ -6,6 +6,17 @@ import { createServerSupabaseClient } from "@/lib/supabase/server"
 
 const API_URL = "http://localhost:5000/api"
 
+/**
+ * Get auth token from server-side Supabase session
+ */
+async function getAuthToken() {
+  const supabase = await createServerSupabaseClient()
+  if (!supabase) return null
+
+  const { data: { session } } = await supabase.auth.getSession()
+  return session?.access_token || null
+}
+
 export async function checkAdminAccess() {
   const supabase = await createServerSupabaseClient()
   if (!supabase) {
@@ -40,10 +51,16 @@ export async function updateOrderStatus(orderId: string, status: string) {
   await checkAdminAccess()
 
   try {
+    const token = await getAuthToken()
+    if (!token) {
+      return { error: "Non authentifié" }
+    }
+
     const res = await fetch(`${API_URL}/orders/${orderId}/status`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
       },
       body: JSON.stringify({ status }),
     })
@@ -79,10 +96,16 @@ export async function createProduct(formData: FormData) {
   }
 
   try {
+    const token = await getAuthToken()
+    if (!token) {
+      return { error: "Non authentifié" }
+    }
+
     const res = await fetch(`${API_URL}/products`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
       },
       body: JSON.stringify(productData),
     })
@@ -117,10 +140,16 @@ export async function updateProduct(productId: string, formData: FormData) {
   }
 
   try {
+    const token = await getAuthToken()
+    if (!token) {
+      return { error: "Non authentifié" }
+    }
+
     const res = await fetch(`${API_URL}/products/${productId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
       },
       body: JSON.stringify(productData),
     })
@@ -141,8 +170,16 @@ export async function deleteProduct(productId: string) {
   await checkAdminAccess()
 
   try {
+    const token = await getAuthToken()
+    if (!token) {
+      return { error: "Non authentifié" }
+    }
+
     const res = await fetch(`${API_URL}/products/${productId}`, {
       method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+      },
     })
 
     if (!res.ok) {

@@ -25,12 +25,21 @@ export async function createOrder(data: CheckoutData) {
     return { error: "Non autorisé" }
   }
 
+  const { data: { session } } = await supabase.auth.getSession()
+  const token = session?.access_token
+
+  if (!token) {
+    console.error("🚨 Token d'authentification manquant")
+    return { error: "Non authentifié" }
+  }
+
   // 🔍 Étape 2 : Appel au backend pour créer la commande
   try {
     const res = await fetch("http://localhost:5000/api/orders", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
       },
       body: JSON.stringify({
         userId: user.id,

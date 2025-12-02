@@ -45,10 +45,16 @@ export default async function OrdersPage({
   const currentPage = Number(page) || 1
   const limit = 10
 
+  const { data: { session } } = await supabase.auth.getSession()
+  const token = session?.access_token
+
   const res = await fetch(
     `http://localhost:5000/api/orders?userId=${user.id}&page=${currentPage}&limit=${limit}&status=${statusFilter}`,
     {
       cache: "no-store",
+      headers: token ? {
+        Authorization: `Bearer ${token}`
+      } : undefined
     }
   )
 

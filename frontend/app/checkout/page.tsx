@@ -24,9 +24,15 @@ export default async function CheckoutPage() {
     redirect("/auth/login?redirect=/checkout");
   }
 
+  const { data: { session } } = await supabase.auth.getSession()
+  const token = session?.access_token
+
   // Récupérer les éléments du panier
   const cartRes = await fetch(`http://localhost:5000/api/cart?userId=${user.id}`, {
     cache: "no-store",
+    headers: token ? {
+      Authorization: `Bearer ${token}`
+    } : undefined
   })
 
   const cartItems = cartRes.ok ? await cartRes.json() : []

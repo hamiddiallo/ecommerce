@@ -38,7 +38,11 @@ export async function createOrder(data: CheckoutData) {
 
   try {
     const token = await getAuthToken()
+    console.log("createOrder token present:", !!token)
+    if (token) console.log("createOrder token length:", token.length)
+
     if (!token) {
+      console.log("createOrder: No token found")
       return { error: "Non authentifié" }
     }
 
@@ -51,9 +55,12 @@ export async function createOrder(data: CheckoutData) {
       body: JSON.stringify({ userId: user.id, checkoutData: data }),
     });
 
+    console.log("createOrder response status:", res.status)
+
     if (!res.ok) {
-      const error = await res.json();
-      return { error: error.error || "Erreur lors de la création de la commande" };
+      const errorData = await res.json();
+      console.log("createOrder error response:", errorData)
+      return { error: errorData.error || "Erreur lors de la création de la commande" };
     }
 
     const result = await res.json();

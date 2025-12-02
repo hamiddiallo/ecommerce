@@ -1,9 +1,9 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Share2 } from "lucide-react"
+import { Share2, Printer } from "lucide-react"
 import Image from "next/image"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 
 interface OrderItem {
@@ -74,6 +74,23 @@ function numberToWords(num: number): string {
 
 export function Invoice({ order }: InvoiceProps) {
     const [isSharing, setIsSharing] = useState(false)
+    const [isMobile, setIsMobile] = useState(false)
+
+    useEffect(() => {
+        // Detect if device is mobile or tablet
+        const checkMobile = () => {
+            const mobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 1024
+            setIsMobile(mobile)
+        }
+
+        checkMobile()
+        window.addEventListener('resize', checkMobile)
+        return () => window.removeEventListener('resize', checkMobile)
+    }, [])
+
+    const handlePrint = () => {
+        window.print()
+    }
 
     const getPDFBlob = async () => {
         const supabase = createClient()
@@ -147,12 +164,21 @@ export function Invoice({ order }: InvoiceProps) {
 
     return (
         <div className="min-h-screen bg-white">
-            {/* Share Button - Hidden when printing */}
+            {/* Action Buttons - Hidden when printing */}
             <div className="print:hidden fixed top-4 right-4 z-50">
-                <Button onClick={handleSharePDF} size="lg" className="shadow-lg bg-green-600 hover:bg-green-700" disabled={isSharing}>
-                    <Share2 className="mr-2 h-4 w-4" />
-                    {isSharing ? "Partage..." : "Partager"}
-                </Button>
+                {isMobile ? (
+                    // Mobile/Tablet: Show Share button
+                    <Button onClick={handleSharePDF} size="lg" className="shadow-lg bg-green-600 hover:bg-green-700" disabled={isSharing}>
+                        <Share2 className="mr-2 h-4 w-4" />
+                        {isSharing ? "Partage..." : "Partager"}
+                    </Button>
+                ) : (
+                    // Desktop: Show Print button
+                    <Button onClick={handlePrint} size="lg" variant="outline" className="shadow-lg">
+                        <Printer className="mr-2 h-4 w-4" />
+                        Imprimer
+                    </Button>
+                )}
             </div>
 
             {/* Invoice Content */}
@@ -277,8 +303,8 @@ export function Invoice({ order }: InvoiceProps) {
                 @media print {
                     /* Remove browser headers/footers */
                     @page {
-                        size: A4;
-                        margin: 0;
+                        size: A4 portrait;
+                        margin: 1cm;
                     }
                     
                     html, body {
@@ -286,6 +312,8 @@ export function Invoice({ order }: InvoiceProps) {
                         padding: 0;
                         print-color-adjust: exact;
                         -webkit-print-color-adjust: exact;
+                        width: 100%;
+                        height: 100%;
                     }
                     
                     .print\\:hidden {
@@ -295,14 +323,22 @@ export function Invoice({ order }: InvoiceProps) {
                     .invoice-wrapper {
                         padding: 0;
                         margin: 0;
+                        width: 100%;
                     }
                     
                     .invoice-content {
                         transform: none;
                         width: 100%;
-                        max-width: 100%;
-                        margin: 0.5cm;
+                        max-width: 19cm; /* A4 width minus margins */
+                        margin: 0 auto;
                         padding: 0;
+                        box-sizing: border-box;
+                    }
+                    
+                    /* Ensure table fits on page */
+                    table {
+                        width: 100%;
+                        table-layout: fixed;
                     }
                     
                     /* Ensure table rows don't break across pages */

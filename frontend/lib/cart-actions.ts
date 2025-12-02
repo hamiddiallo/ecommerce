@@ -164,3 +164,33 @@ export async function getCartCount() {
     return 0
   }
 }
+
+export async function getCart() {
+  const supabase = await createServerSupabaseClient()
+  if (!supabase) return []
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) return []
+
+  try {
+    const token = await getAuthToken()
+    if (!token) return []
+
+    const res = await fetch(`${API_URL}/cart?userId=${user.id}`, {
+      cache: 'no-store',
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    })
+
+    if (!res.ok) return []
+
+    return await res.json()
+  } catch (error) {
+    console.error("Get cart error:", error)
+    return []
+  }
+}

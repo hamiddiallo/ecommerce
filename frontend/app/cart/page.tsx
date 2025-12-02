@@ -8,6 +8,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import Link from "next/link"
 import { ShoppingBag, ArrowRight } from "lucide-react"
 import { redirect } from "next/navigation"
+import { getCart } from "@/lib/cart-actions"
 
 export default async function CartPage() {
   const supabase = await createServerSupabaseClient()
@@ -24,11 +25,7 @@ export default async function CartPage() {
     redirect("/auth/login?redirect=/cart")
   }
 
-  const res = await fetch(`http://localhost:5000/api/cart?userId=${user.id}`, {
-    cache: "no-store",
-  })
-
-  const cartItems = res.ok ? await res.json() : []
+  const cartItems = await getCart()
 
   const total =
     cartItems?.reduce((sum: number, item: any) => {

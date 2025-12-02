@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
+import { apiFetch } from "@/lib/api"
 import { AdminNav } from "@/components/admin-nav"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Package, ShoppingBag, TrendingUp, Users } from "lucide-react"
@@ -39,10 +40,8 @@ export default function AdminDashboard() {
   }, [])
 
   async function fetchDashboard() {
-    const API_URL = "/api";
-
-    // 1️⃣ Totals
-    const statsRes = await fetch(`${API_URL}/admin/stats`);
+    // 1️⃣ Totals - Use apiFetch for authenticated requests
+    const statsRes = await apiFetch('/admin/stats');
     const stats = statsRes.ok ? await statsRes.json() : { productsCount: 0, ordersCount: 0, pendingOrdersCount: 0 };
 
     setProductsCount(stats.productsCount);
@@ -72,7 +71,7 @@ export default function AdminDashboard() {
     setAvgOrder(ordersList.length > 0 ? revenue / ordersList.length : 0);
 
     // 3️⃣ Top 5 produits vendus
-    const itemsRes = await fetch(`${API_URL}/admin/order-items`);
+    const itemsRes = await apiFetch('/admin/order-items');
     const topProductsData = itemsRes.ok ? await itemsRes.json() : [];
 
     const productMap: Record<string, number> = {};

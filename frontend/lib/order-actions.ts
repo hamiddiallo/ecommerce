@@ -6,6 +6,17 @@ import { redirect } from "next/navigation";
 
 const API_URL = "http://localhost:5000/api";
 
+/**
+ * Get auth token from server-side Supabase session
+ */
+async function getAuthToken() {
+  const supabase = await createServerSupabaseClient()
+  if (!supabase) return null
+
+  const { data: { session } } = await supabase.auth.getSession()
+  return session?.access_token || null
+}
+
 interface CheckoutData {
   fullName: string;
   phone: string;
@@ -26,9 +37,17 @@ export async function createOrder(data: CheckoutData) {
   }
 
   try {
+    const token = await getAuthToken()
+    if (!token) {
+      return { error: "Non authentifié" }
+    }
+
     const res = await fetch(`${API_URL}/orders`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
       body: JSON.stringify({ userId: user.id, checkoutData: data }),
     });
 
@@ -61,7 +80,15 @@ export async function getOrders() {
   }
 
   try {
-    const res = await fetch(`${API_URL}/orders?userId=${user.id}`, { cache: 'no-store' });
+    const token = await getAuthToken()
+    if (!token) return []
+
+    const res = await fetch(`${API_URL}/orders?userId=${user.id}`, {
+      cache: 'no-store',
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
     if (!res.ok) return [];
     return await res.json();
   } catch (error) {
@@ -83,9 +110,17 @@ export async function cancelOrder(orderId: string) {
   }
 
   try {
+    const token = await getAuthToken()
+    if (!token) {
+      return { error: "Non authentifié" }
+    }
+
     const res = await fetch(`${API_URL}/orders/${orderId}/cancel`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
       body: JSON.stringify({ userId: user.id }),
     });
 
@@ -115,9 +150,17 @@ export async function unlockOrder(orderId: string) {
   }
 
   try {
+    const token = await getAuthToken()
+    if (!token) {
+      return { error: "Non authentifié" }
+    }
+
     const res = await fetch(`${API_URL}/orders/${orderId}/unlock`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
       body: JSON.stringify({ userId: user.id }),
     });
 

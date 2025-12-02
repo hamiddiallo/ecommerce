@@ -7,11 +7,21 @@ const {
     updateProduct,
     deleteProduct
 } = require('../controllers/productsController');
+const { verifyToken, requireAdmin } = require('../middleware/auth');
 
-router.get('/', getProducts);
-router.get('/:id', getProductById);
-router.post('/', createProduct);
-router.put('/:id', updateProduct);
-router.delete('/:id', deleteProduct);
+// Cache middleware
+const cache = (req, res, next) => {
+    res.set('Cache-Control', 'public, max-age=60'); // Cache for 60 seconds
+    next();
+};
+
+// Public routes
+router.get('/', cache, getProducts);
+router.get('/:id', cache, getProductById);
+
+// Admin-only routes
+router.post('/', verifyToken, requireAdmin, createProduct);
+router.put('/:id', verifyToken, requireAdmin, updateProduct);
+router.delete('/:id', verifyToken, requireAdmin, deleteProduct);
 
 module.exports = router;

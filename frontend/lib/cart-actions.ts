@@ -5,6 +5,17 @@ import { revalidatePath } from "next/cache"
 
 const API_URL = "http://localhost:5000/api"
 
+/**
+ * Get auth token from server-side Supabase session
+ */
+async function getAuthToken() {
+  const supabase = await createServerSupabaseClient()
+  if (!supabase) return null
+
+  const { data: { session } } = await supabase.auth.getSession()
+  return session?.access_token || null
+}
+
 export async function addToCart(productId: string, quantity = 1) {
   const supabase = await createServerSupabaseClient()
   if (!supabase) {
@@ -20,9 +31,17 @@ export async function addToCart(productId: string, quantity = 1) {
   }
 
   try {
+    const token = await getAuthToken()
+    if (!token) {
+      return { error: "Non authentifié" }
+    }
+
     const res = await fetch(`${API_URL}/cart`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
       body: JSON.stringify({ userId: user.id, productId, quantity }),
     })
 
@@ -53,9 +72,17 @@ export async function updateCartQuantity(cartItemId: string, quantity: number) {
   }
 
   try {
+    const token = await getAuthToken()
+    if (!token) {
+      return { error: "Non authentifié" }
+    }
+
     const res = await fetch(`${API_URL}/cart/${cartItemId}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
       body: JSON.stringify({ userId: user.id, quantity }),
     })
 
@@ -85,8 +112,16 @@ export async function removeFromCart(cartItemId: string) {
   }
 
   try {
+    const token = await getAuthToken()
+    if (!token) {
+      return { error: "Non authentifié" }
+    }
+
     const res = await fetch(`${API_URL}/cart/${cartItemId}?userId=${user.id}`, {
       method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
     })
 
     if (!res.ok) {
@@ -111,7 +146,15 @@ export async function getCartCount() {
   if (!user) return 0
 
   try {
-    const res = await fetch(`${API_URL}/cart?userId=${user.id}`, { cache: 'no-store' })
+    const token = await getAuthToken()
+    if (!token) return 0
+
+    const res = await fetch(`${API_URL}/cart?userId=${user.id}`, {
+      cache: 'no-store',
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    })
     if (!res.ok) return 0
 
     const cartItems = await res.json()

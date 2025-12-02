@@ -82,7 +82,7 @@ export default function HomePage() {
             {/* Hero Section */}
             <section className="relative bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
                 <div className="container mx-auto px-6 py-24 text-center">
-                    <h1 className="text-4xl md:text-6xl font-bold mb-4">Bienvenue chez ETS MLF</h1>
+                    <h1 className="text-4xl md:text-6xl font-bold mb-4">Bienvenue chez MDH Distribution</h1>
                     <p className="text-lg md:text-2xl mb-8">
                         Votre boutique premium pour tous vos besoins : maison, beauté, électronique et plus encore.
                     </p>
@@ -151,20 +151,20 @@ export default function HomePage() {
                     <div className="md:w-1/2">
                         <img
                             src={normalizeImageUrl("koto.jpeg")}
-                            alt="Gérant ETS MLF"
+                            alt="Gérant MDH Distribution"
                             className="rounded-xl shadow-lg w-full object-cover h-80 md:h-full"
                         />
                     </div>
                     <div className="md:w-1/2">
                         <h2 className="text-3xl font-bold mb-4">À propos de notre gérant</h2>
                         <p className="text-gray-800 mb-4">
-                            M. Mouctar Diallo est un entrepreneur passionné et visionnaire, engagé à offrir à ses clients une expérience d’achat exceptionnelle. Fort de son expertise et de son sens aigu du service, il met un point d’honneur à sélectionner avec soin chaque produit disponible chez ETS MLF, en veillant à ce que la qualité, la durabilité et l’innovation soient au rendez-vous.
+                            M. Mouctar Diallo est un entrepreneur passionné et visionnaire, engagé à offrir à ses clients une expérience d'achat exceptionnelle. Fort de son expertise et de son sens aigu du service, il met un point d'honneur à sélectionner avec soin chaque produit disponible chez MDH Distribution, en veillant à ce que la qualité, la durabilité et l'innovation soient au rendez-vous.
                         </p>
                         <p className="text-gray-700  mb-4">
-                            Depuis la création de la boutique, M. Mouctar s’emploie à créer un environnement où la diversité des produits répond aux besoins variés de chaque client, qu’il s’agisse d’articles ménagers, d’accessoires, de cosmétiques ou de fournitures électroniques et scolaires. Sa démarche est guidée par la conviction que chaque produit doit apporter confort, praticité et satisfaction.
+                            Depuis la création de la boutique, M. Mouctar s'emploie à créer un environnement où la diversité des produits répond aux besoins variés de chaque client, qu'il s'agisse d'articles ménagers, d'accessoires, de cosmétiques ou de fournitures électroniques et scolaires. Sa démarche est guidée par la conviction que chaque produit doit apporter confort, praticité et satisfaction.
                         </p>
                         <p className="text-gray-700  mb-4">
-                            Sous sa direction, ETS MLF s’est imposée comme une référence en matière de qualité et de fiabilité, offrant un service client irréprochable et des conseils personnalisés. M. Mouctar travaille chaque jour avec rigueur et passion pour que chaque client se sente valorisé et pour que l’expérience d’achat soit agréable, fluide et mémorable.
+                            Sous sa direction, MDH Distribution s'est imposée comme une référence en matière de qualité et de fiabilité, offrant un service client irréprochable et des conseils personnalisés. M. Mouctar travaille chaque jour avec rigueur et passion pour que chaque client se sente valorisé et pour que l'expérience d'achat soit agréable, fluide et mémorable.
                         </p>
                     </div>
                 </div>

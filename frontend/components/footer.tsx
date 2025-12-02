@@ -6,64 +6,54 @@ export function Footer() {
       <div className="container py-8">
         <div className="grid gap-8 md:grid-cols-4">
           <div>
-            <h3 className="mb-4 font-semibold">ETS MLF</h3>
+            <h3 className="mb-4 font-semibold">MDH Distribution</h3>
             <p className="text-sm text-muted-foreground">
-              Votre boutique en ligne de confiance pour tous vos besoins quotidiens.
+              Votre boutique de confiance pour tous vos besoins quotidiens.
             </p>
           </div>
+
           <div>
-            <h3 className="mb-4 font-semibold">Catégories</h3>
+            <h3 className="mb-4 font-semibold">Liens rapides</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/category/cosmetiques" className="text-muted-foreground hover:text-primary">
-                  Cosmétiques
+                <Link href="/" className="text-muted-foreground hover:text-foreground">
+                  Accueil
                 </Link>
               </li>
               <li>
-                <Link href="/category/hygiene" className="text-muted-foreground hover:text-primary">
-                  Hygiène
+                <Link href="/" className="text-muted-foreground hover:text-foreground">
+                  Produits
                 </Link>
               </li>
               <li>
-                <Link href="/category/fournitures-scolaires" className="text-muted-foreground hover:text-primary">
-                  Fournitures Scolaires
+                <Link href="/cart" className="text-muted-foreground hover:text-foreground">
+                  Panier
                 </Link>
               </li>
             </ul>
           </div>
+
           <div>
-            <h3 className="mb-4 font-semibold">Aide</h3>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link href="/homepage" className="text-muted-foreground hover:text-primary">
-                  Contact
-                </Link>
-              </li>
+            <h3 className="mb-4 font-semibold">Contact</h3>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li>Email: mouctardh45@gmail.com</li>
+              <li>Tél: (+224) 620 03 77 78</li>
+              <li>Adresse: Grand marché central de Labé</li>
             </ul>
           </div>
+
           <div>
-            <h3 className="mb-4 font-semibold">Mon Compte</h3>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link href="/auth/login" className="text-muted-foreground hover:text-primary">
-                  Connexion
-                </Link>
-              </li>
-              <li>
-                <Link href="/auth/sign-up" className="text-muted-foreground hover:text-primary">
-                  Créer un compte
-                </Link>
-              </li>
-              <li>
-                <Link href="/orders" className="text-muted-foreground hover:text-primary">
-                  Mes commandes
-                </Link>
-              </li>
+            <h3 className="mb-4 font-semibold">Informations légales</h3>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li>NIF: 393097985</li>
+              <li>RCCM: GN.TCC.2024.07709</li>
+              <li>N°ENTREPRISE: GN.TCC.2024.A.06830</li>
             </ul>
           </div>
         </div>
+
         <div className="mt-8 border-t pt-8 text-center text-sm text-muted-foreground">
-          <p>&copy; 2025 ETS MLF. Tous droits réservés.</p>
+          <p>&copy; 2025 MDH Distribution. Tous droits réservés.</p>
         </div>
       </div>
     </footer>

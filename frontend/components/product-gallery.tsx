@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
+import { normalizeImageUrl } from "@/lib/image-url"
 
 interface ProductGalleryProps {
     images: string[]
@@ -10,8 +11,10 @@ interface ProductGalleryProps {
 }
 
 export function ProductGallery({ images, name }: ProductGalleryProps) {
-    // Ensure we have at least one image or placeholder
-    const galleryImages = images && images.length > 0 ? images : ["/placeholder.svg"]
+    // Ensure we have at least one image or placeholder, and normalize all URLs
+    const galleryImages = images && images.length > 0
+        ? images.map(normalizeImageUrl)
+        : ["/placeholder.svg"]
     const [selectedImage, setSelectedImage] = useState(galleryImages[0])
 
     return (

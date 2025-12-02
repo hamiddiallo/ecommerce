@@ -42,7 +42,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
   try {
     const res = await fetch(`http://localhost:5000/api/products?page=${currentPage}&limit=${limit}`, {
-      cache: "no-store",
+      next: { revalidate: 60 }, // Cache for 60 seconds
     })
 
     if (!res.ok) {

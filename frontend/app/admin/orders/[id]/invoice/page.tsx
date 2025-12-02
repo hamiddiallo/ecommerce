@@ -84,7 +84,7 @@ export default async function InvoicePage({ params }: InvoicePageProps) {
 
         // Le numéro séquentiel est le nombre de commandes + 1 (incluant celle-ci)
         const sequentialNumber = (count || 0)
-        const invoiceNumber = `ETSMLF-${orderYear}-${String(sequentialNumber).padStart(3, "0")}`
+        const invoiceNumber = `MDHD-${orderYear}-${String(sequentialNumber).padStart(3, "0")}`
 
         // Transformer les données pour le composant Invoice
         const transformedOrder = {

@@ -6,6 +6,10 @@ const {
     removeFavorite,
     checkFavorite
 } = require('../controllers/favoritesController');
+const { verifyToken } = require('../middleware/auth');
+
+// All favorites routes require authentication
+router.use(verifyToken);
 
 // Get user's favorites
 router.get('/', getFavorites);
